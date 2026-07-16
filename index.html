@@ -9,6 +9,7 @@
 <title>私房菜谱 - 美味检索</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap&subset=chinese-simplified" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js" defer></script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -40,16 +41,18 @@
           <span class="search-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </span>
-          <input type="text" id="searchInput" placeholder="搜索菜名、食材、口味..." autocomplete="off">
+          <input type="text" id="searchInput" placeholder="搜索菜名、食材、口味...（支持拼音）" autocomplete="off">
           <button class="search-clear" id="searchClear" aria-label="清除">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
+        <div class="search-suggestions" id="searchSuggestions" style="display:none"></div>
       </div>
       <button class="wheel-entry-btn" id="wheelEntryBtn" title="今日菜谱轮盘抽奖">
         <span class="btn-icon">🎰</span> 今日菜谱
       </button>
       <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">🌓</button>
+      <button class="add-recipe-btn" id="addRecipeBtn" title="新增菜谱">＋ 新增</button>
     </div>
 
     <div class="filter-row">
@@ -249,6 +252,71 @@
   </div>
 </div>
 
+<!-- Recipe Form Modal (新增/编辑) -->
+<div class="modal-overlay" id="recipeFormOverlay">
+  <div class="modal-content recipe-form-modal" id="recipeFormContent">
+    <button class="modal-close" id="recipeFormClose">✕</button>
+    <div class="modal-inner">
+      <h2 class="modal-title" id="recipeFormTitle">新增菜谱</h2>
+      <form id="recipeForm" autocomplete="off">
+        <div class="form-row">
+          <label>菜名 <span class="required">*</span></label>
+          <input type="text" name="title" required placeholder="如：红烧排骨">
+        </div>
+        <div class="form-row form-row-3">
+          <label>分类 <span class="required">*</span>
+            <select name="category" required>
+              <option value="家常菜">家常菜</option><option value="主食">主食</option><option value="汤品">汤品</option><option value="凉菜">凉菜</option><option value="小吃">小吃</option>
+            </select>
+          </label>
+          <label>子分类
+            <select name="subcategory">
+              <option value="">自动</option><option value="猪肉">猪肉</option><option value="鸡肉">鸡肉</option><option value="牛肉">牛肉</option><option value="海鲜">海鲜</option><option value="素菜">素菜</option><option value="面食">面食</option><option value="米饭">米饭</option><option value="羊肉">羊肉</option><option value="蛋类">蛋类</option><option value="豆腐">豆腐</option><option value="其他">其他</option>
+            </select>
+          </label>
+          <label>难度
+            <select name="difficulty">
+              <option value="中等">中等</option><option value="简单">简单</option><option value="困难">困难</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row form-row-3">
+          <label>烹饪时间(分钟)
+            <input type="number" name="cookingTime" value="30" min="1" max="300">
+          </label>
+          <label>份量
+            <input type="text" name="servings" value="2-3人份">
+          </label>
+          <label>标签（逗号分隔）
+            <input type="text" name="tags" placeholder="如：快手,下饭,红烧">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>食材清单 <span class="required">*</span> <small>（每行: 名称 用量 备注）</small></label>
+          <textarea name="ingredients" rows="5" required placeholder="去骨鸡腿 2只 带皮更香&#10;鸡蛋 3个 打散&#10;生抽 2勺"></textarea>
+        </div>
+        <div class="form-row">
+          <label>步骤 <span class="required">*</span> <small>（用 ## 阶段名 分隔阶段）</small></label>
+          <textarea name="steps" rows="8" required placeholder="## 准备&#10;1. 鸡腿去骨切块。&#10;2. 加生抽料酒腌制。&#10;&#10;## 炒制&#10;3. 热锅冷油煎鸡腿。&#10;4. 加入酱汁焖煮。"></textarea>
+        </div>
+        <div class="form-row">
+          <label>烹饪技巧 <small>（每行一条）</small></label>
+          <textarea name="tips" rows="3" placeholder="腌时加淀粉锁水&#10;小火慢煎更香"></textarea>
+        </div>
+        <div class="form-row">
+          <label>营养分析 <small>（每行一条）</small></label>
+          <textarea name="nutrition" rows="3" placeholder="蛋白≈60g&#10;热量≈400大卡/人份"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="recipeFormCancel">取消</button>
+          <button type="submit" class="btn-submit" id="recipeFormSubmit">保存菜谱</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="supabase.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

@@ -10,6 +10,14 @@ async function loadRecipes() {
   try {
     const res = await fetch('recipes_full.json');
     recipes = await res.json();
+    // 为每道菜生成拼音搜索字段
+    recipes.forEach(r => {
+      try {
+        if (typeof pinyinPro !== 'undefined') {
+          r._pinyin = pinyinPro.pinyin(r.title, { toneType: 'none', type: 'array' }).join('');
+        }
+      } catch(e) { r._pinyin = ''; }
+    });
     buildCategoryTree();
     renderSidebar();
     renderFilterTags();
@@ -51,19 +59,18 @@ function buildCategoryTree() {
 }
 
 function initFuse() {
-  fuse = new Fuse(recipes, {
+  const options = {
     keys: [
-      { name: 'title', weight: 4 },
-      { name: 'tags', weight: 2 },
-      { name: 'ingredients.name', weight: 2 },
-      { name: 'subcategory', weight: 1 },
-      { name: 'category', weight: 1 },
+      { name: 'title', weight: 0.4 },
+      { name: '_pinyin', weight: 0.3 },
+      { name: 'tags', weight: 0.2 },
+      { name: 'ingredients.name', weight: 0.1 },
     ],
-    threshold: 0.35,
+    threshold: 0.4,
     distance: 100,
     includeScore: true,
-    minMatchCharLength: 1,
-  });
+  };
+  fuse = new Fuse(recipes, options);
 }
 
 // ==================== STATE ====================
@@ -209,19 +216,18 @@ async function ensureFuseLoaded() {
 }
 
 function initFuse() {
-  fuse = new Fuse(recipes, {
+  const options = {
     keys: [
-      { name: 'title', weight: 4 },
-      { name: 'tags', weight: 2 },
-      { name: 'ingredients.name', weight: 2 },
-      { name: 'subcategory', weight: 1 },
-      { name: 'category', weight: 1 },
+      { name: 'title', weight: 0.4 },
+      { name: '_pinyin', weight: 0.3 },
+      { name: 'tags', weight: 0.2 },
+      { name: 'ingredients.name', weight: 0.1 },
     ],
-    threshold: 0.35,
+    threshold: 0.4,
     distance: 100,
     includeScore: true,
-    minMatchCharLength: 1,
-  });
+  };
+  fuse = new Fuse(recipes, options);
 }
 
 function getFilteredRecipes() {
@@ -343,6 +349,7 @@ function showModal(recipe) {
       <div class="modal-actions">
         ${hasIng ? `<button class="add-shopping-btn" id="modalShoppingBtn" data-id="${recipe.id}">🛒 加入清单</button>` : ''}
         <button class="modal-timer-trigger" id="modalTimerBtn" data-id="${recipe.id}">⏱ 开始计时</button>
+        <button class="modal-edit-btn" id="modalEditBtn" data-id="${recipe.id}">✏️ 编辑</button>
       </div>`;
 
   // 食材清单
@@ -478,6 +485,15 @@ function showModal(recipe) {
       openTimerModal();
     });
   }
+
+  // 弹窗内编辑按钮
+  const modalEditBtn = document.getElementById('modalEditBtn');
+  if (modalEditBtn) {
+    modalEditBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openRecipeForm(recipe);
+    });
+  }
 }
 
 function closeModal() {
@@ -505,6 +521,7 @@ searchInput.addEventListener('input', async function() {
     }
   }
   renderResults();
+  showSuggestions(this.value.trim());
 });
 searchClear.addEventListener('click', function() {
   searchInput.value = '';
@@ -512,6 +529,91 @@ searchClear.addEventListener('click', function() {
   searchClear.classList.remove('visible');
   searchInput.focus();
   renderResults();
+});
+
+// ==================== SEARCH SUGGESTIONS ====================
+let suggestionIndex = -1;
+const suggestionsEl = document.getElementById('searchSuggestions');
+
+function showSuggestions(query) {
+  if (!query || query.length < 1) {
+    suggestionsEl.style.display = 'none';
+    return;
+  }
+  // 使用 Fuse 搜索前 5 个结果
+  let results;
+  if (fuse) {
+    results = fuse.search(query).slice(0, 5);
+  } else {
+    // fallback: 简单匹配
+    const q = query.toLowerCase();
+    results = recipes
+      .filter(r => r.title.includes(q) || (r._pinyin && r._pinyin.includes(q)))
+      .slice(0, 5)
+      .map(r => ({ item: r }));
+  }
+
+  if (results.length === 0) {
+    suggestionsEl.style.display = 'none';
+    return;
+  }
+
+  suggestionIndex = -1;
+  suggestionsEl.innerHTML = results.map((r, i) => {
+    const recipe = r.item || r;
+    return `
+      <div class="search-suggestion-item" data-idx="${i}" data-id="${recipe.id}">
+        <span class="sug-title">${recipe.title}</span>
+        <span class="sug-meta">${recipe.subcategory} · ${recipe.difficulty}</span>
+        ${recipe._pinyin ? `<span class="sug-pinyin">${recipe._pinyin}</span>` : ''}
+      </div>`;
+  }).join('');
+  suggestionsEl.style.display = 'block';
+
+  suggestionsEl.querySelectorAll('.search-suggestion-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const id = parseInt(this.dataset.id);
+      const recipe = recipes.find(r => r.id === id);
+      if (recipe) {
+        searchInput.value = recipe.title;
+        state.searchKeyword = recipe.title;
+        searchClear.classList.add('visible');
+        suggestionsEl.style.display = 'none';
+        showModal(recipe);
+      }
+    });
+    item.addEventListener('mousedown', function(e) { e.preventDefault(); });
+  });
+}
+
+// 修改 searchInput 事件，加入建议
+searchInput.addEventListener('focus', function() {
+  if (this.value.trim()) showSuggestions(this.value.trim());
+});
+
+searchInput.addEventListener('keydown', function(e) {
+  const items = suggestionsEl.querySelectorAll('.search-suggestion-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    suggestionIndex = Math.min(suggestionIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === suggestionIndex));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    suggestionIndex = Math.max(suggestionIndex - 1, -1);
+    items.forEach((el, i) => el.classList.toggle('active', i === suggestionIndex));
+  } else if (e.key === 'Enter' && suggestionIndex >= 0) {
+    e.preventDefault();
+    const active = items[suggestionIndex];
+    if (active) active.click();
+  } else if (e.key === 'Escape') {
+    suggestionsEl.style.display = 'none';
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.search-wrapper')) {
+    suggestionsEl.style.display = 'none';
+  }
 });
 
 document.getElementById('menuToggle').addEventListener('click', function() {
@@ -1043,6 +1145,8 @@ document.addEventListener('keydown', function(e) {
       closeWheel();
     } else if (document.getElementById('shoppingPanel').classList.contains('open')) {
       closeShoppingPanel();
+    } else if (document.getElementById('recipeFormOverlay').classList.contains('show')) {
+      closeRecipeForm();
     } else {
       closeModal();
     }
@@ -1477,6 +1581,164 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+
+// ==================== RECIPE FORM (CRUD) ====================
+let editingRecipeId = null; // null = 新增模式, number = 编辑模式
+
+function openRecipeForm(recipe = null) {
+  editingRecipeId = recipe ? recipe.id : null;
+  const form = document.getElementById('recipeForm');
+  const titleEl = document.getElementById('recipeFormTitle');
+  const submitBtn = document.getElementById('recipeFormSubmit');
+
+  if (recipe) {
+    titleEl.textContent = '编辑菜谱';
+    submitBtn.textContent = '更新菜谱';
+    form.title.value = recipe.title || '';
+    form.category.value = recipe.category || '家常菜';
+    form.subcategory.value = recipe.subcategory || '';
+    form.difficulty.value = recipe.difficulty || '中等';
+    form.cookingTime.value = recipe.cookingTime || 30;
+    form.servings.value = recipe.servings || '2-3人份';
+    form.tags.value = (recipe.tags || []).join(', ');
+    // 食材转文本
+    form.ingredients.value = (recipe.ingredients || []).map(ing =>
+      [ing.name, ing.amount, ing.note].filter(Boolean).join(' ')
+    ).join('\n');
+    // 步骤转文本
+    form.steps.value = (recipe.steps || []).map(step =>
+      `## ${step.phase}\n${step.items.join('\n')}`
+    ).join('\n\n');
+    form.tips.value = (recipe.tips || []).join('\n');
+    form.nutrition.value = (recipe.nutrition || []).join('\n');
+  } else {
+    titleEl.textContent = '新增菜谱';
+    submitBtn.textContent = '保存菜谱';
+    form.reset();
+    form.category.value = '家常菜';
+    form.difficulty.value = '中等';
+    form.cookingTime.value = 30;
+    form.servings.value = '2-3人份';
+  }
+
+  document.getElementById('recipeFormOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('recipeFormContent').scrollTop = 0;
+}
+
+function closeRecipeForm() {
+  document.getElementById('recipeFormOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function parseFormData(form) {
+  const data = {
+    title: form.title.value.trim(),
+    category: form.category.value,
+    subcategory: form.subcategory.value || '其他',
+    difficulty: form.difficulty.value,
+    cookingTime: parseInt(form.cookingTime.value) || 30,
+    servings: form.servings.value || '2-3人份',
+    tags: form.tags.value.split(/[,，]/).map(t => t.trim()).filter(Boolean),
+  };
+
+  // 解析食材
+  data.ingredients = form.ingredients.value.split('\n').filter(Boolean).map(line => {
+    const parts = line.split(/\s+/);
+    return {
+      name: parts[0] || '',
+      amount: parts.slice(1, 2).join(' ') || '',
+      note: parts.slice(2).join(' ') || '',
+    };
+  });
+
+  // 解析步骤
+  data.steps = [];
+  const stepBlocks = form.steps.value.split(/##\s*/).filter(Boolean);
+  stepBlocks.forEach(block => {
+    const lines = block.split('\n').filter(Boolean);
+    data.steps.push({
+      phase: lines[0].trim(),
+      items: lines.slice(1).map(l => l.replace(/^\d+[\.\、\)）]\s*/, '').trim()).filter(Boolean),
+    });
+  });
+
+  data.tips = form.tips.value.split('\n').filter(Boolean).map(t => t.trim());
+  data.nutrition = form.nutrition.value.split('\n').filter(Boolean).map(n => n.trim());
+
+  return data;
+}
+
+async function handleRecipeSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = document.getElementById('recipeFormSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '保存中...';
+
+  try {
+    const data = parseFormData(form);
+
+    if (editingRecipeId) {
+      // 更新模式
+      if (isSupabaseConfigured()) {
+        showLoading('更新中...');
+        await updateRecipeInSupabase(editingRecipeId, data);
+        hideLoading();
+      }
+      // 更新本地数据
+      const idx = recipes.findIndex(r => r.id === editingRecipeId);
+      if (idx > -1) {
+        recipes[idx] = { ...recipes[idx], ...data };
+      }
+    } else {
+      // 新增模式
+      const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1;
+      data.id = newId;
+
+      if (isSupabaseConfigured()) {
+        showLoading('创建中...');
+        await createRecipeInSupabase(data);
+        hideLoading();
+      }
+
+      recipes.push(data);
+      // 生成拼音
+      try {
+        if (typeof pinyinPro !== 'undefined') {
+          data._pinyin = pinyinPro.pinyin(data.title, { toneType: 'none', type: 'array' }).join('');
+        }
+      } catch(e) {}
+    }
+
+    closeRecipeForm();
+    buildCategoryTree();
+    renderSidebar();
+    renderResults();
+    if (fuse) initFuse();
+
+    if (isSupabaseConfigured()) {
+      alert(editingRecipeId ? '菜谱已更新到 Supabase' : '菜谱已保存到 Supabase');
+    } else {
+      alert(editingRecipeId ? '菜谱已更新（本地）\n⚠️ 请配置 SUPABASE_ANON_KEY 以同步到云端' : '菜谱已保存（本地）\n⚠️ 请配置 SUPABASE_ANON_KEY 以同步到云端');
+    }
+  } catch (err) {
+    console.error('保存失败:', err);
+    alert('保存失败: ' + err.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = editingRecipeId ? '更新菜谱' : '保存菜谱';
+  }
+}
+
+// Form events
+document.getElementById('addRecipeBtn').addEventListener('click', () => openRecipeForm());
+document.getElementById('recipeFormClose').addEventListener('click', closeRecipeForm);
+document.getElementById('recipeFormCancel').addEventListener('click', closeRecipeForm);
+document.getElementById('recipeFormOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeRecipeForm();
+});
+document.getElementById('recipeForm').addEventListener('submit', handleRecipeSubmit);
 
 // ==================== INIT ====================
 initTheme();
