@@ -470,28 +470,54 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ==================== WHEEL (今日菜谱轮盘抽奖) ====================
-// 后续优化方向:
-// 1. 历史记录 - 记录每次抽奖结果，避免短期内重复
-// 2. 营养搭配 - 根据营养数据自动推荐均衡搭配
-// 3. 季节推荐 - 根据季节推荐时令菜谱
-// 4. 食材库存 - 结合冰箱食材，只从有食材的菜谱中抽取
-// 5. 多人抽奖 - 支持多人同时抽奖，各自独立结果
-// 6. 难度偏好 - 可设置偏好难度（简单/中等/困难）
-// 7. 时间偏好 - 可设置烹饪时间范围
-// 8. 语音播报 - 抽奖结果语音播报
-// 9. 分享功能 - 分享抽奖结果到社交媒体
-// 10. 数据统计 - 统计哪道菜被抽中最多次
+// ================================================================
+//  今日菜谱 · 轮盘抽奖模块
+//  ──────────────────────────────────────────────────────────────
+//  功能概述：
+//  1. 标签抽奖：选择食材标签（如牛肉、猪肉），随机抽取10道菜生成转盘
+//  2. 自定义抽奖：用户输入任意选项，生成自定义转盘
+//  3. Canvas 绘制转盘，requestAnimationFrame 驱动旋转动画
+//  4. cubic ease-out 缓动函数模拟物理减速，指针指向中奖扇区
+//
+//  核心算法：
+//  - 指针固定在顶部（角度 = -π/2 = 3π/2）
+//  - 随机选中一个扇区后，计算使该扇区中心对准指针所需的目标角度
+//  - 加上5~9圈随机旋转 + 扇区内随机偏移，增强随机感
+//  - 动画结束后，遍历所有扇区确定指针指向哪个
+//
+//  后续优化方向：
+//  1. 历史记录 - 记录每次抽奖结果，避免短期内重复
+//  2. 营养搭配 - 根据营养数据自动推荐均衡搭配
+//  3. 季节推荐 - 根据季节推荐时令菜谱
+//  4. 食材库存 - 结合冰箱食材，只从有食材的菜谱中抽取
+//  5. 多人抽奖 - 支持多人同时抽奖，各自独立结果
+//  6. 难度偏好 - 可设置偏好难度（简单/中等/困难）
+//  7. 时间偏好 - 可设置烹饪时间范围
+//  8. 语音播报 - 抽奖结果语音播报
+//  9. 分享功能 - 分享抽奖结果到社交媒体
+//  10. 数据统计 - 统计哪道菜被抽中最多次
+// ================================================================
 
+/**
+ * 转盘状态管理对象
+ * @property {string}  mode          - 抽奖模式：'tag'(标签) | 'custom'(自定义)
+ * @property {string}  activeTag     - 当前选中的食材标签
+ * @property {Array}   items         - 转盘选项列表 [{label: string, recipe: object|null}]
+ * @property {boolean} isSpinning    - 是否正在旋转中
+ * @property {number}  currentAngle  - 当前旋转角度（弧度），累计值可超过2π
+ * @property {number}  spinVelocity  - 旋转速度（预留，当前使用缓动动画）
+ * @property {number}  animationId   - requestAnimationFrame 返回的动画ID
+ * @property {object}  resultItem    - 中奖结果 {label, recipe}
+ */
 const wheelState = {
-  mode: 'tag',           // 'tag' | 'custom'
-  activeTag: null,       // current selected tag
-  items: [],             // wheel items: [{label, recipe}]
+  mode: 'tag',
+  activeTag: null,
+  items: [],
   isSpinning: false,
   currentAngle: 0,
   spinVelocity: 0,
   animationId: null,
-  resultItem: null,      // the winning item
+  resultItem: null,
 };
 
 // Color palette for wheel segments
@@ -516,6 +542,11 @@ let wheelCanvas = null;
 let wheelCtx = null;
 
 // ==================== WHEEL MODAL ====================
+
+/**
+ * 打开轮盘抽奖弹窗
+ * 根据当前模式（标签/自定义）恢复上次的转盘状态
+ */
 function openWheel() {
   wheelOverlay.classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -575,6 +606,12 @@ function renderWheelTags() {
 }
 
 // ==================== GENERATE WHEEL ITEMS ====================
+
+/**
+ * 标签模式：根据选中的食材标签生成转盘
+ * 从该标签下随机抽取最多10道菜谱，洗牌后放入转盘
+ * @param {string} tag - 食材标签（如"牛肉"、"猪肉"）
+ */
 function generateTagWheel(tag) {
   // Filter recipes by tag (subcategory)
   let filtered = recipes.filter(r => r.subcategory === tag);
@@ -634,6 +671,12 @@ function generateCustomWheel() {
 }
 
 // ==================== CANVAS ====================
+
+/**
+ * 初始化转盘 Canvas 元素
+ * 创建 640x640 高清画布（CSS 缩放为 320px，适配 Retina 屏）
+ * 同时创建指针三角形元素
+ */
 function initWheelCanvas() {
   // Remove existing canvas
   const existing = wheelCanvasArea.querySelector('.wheel-canvas-wrap');
@@ -667,6 +710,21 @@ function showWheelEmpty(msg) {
   wheelResult.classList.remove('show');
 }
 
+/**
+ * 绘制转盘（核心渲染函数）
+ *
+ * 绘制流程：
+ * 1. 清空画布
+ * 2. 遍历所有选项，绘制每个扇区：
+ *    - 使用 WHEEL_COLORS 循环取色
+ *    - 从圆心画弧线到外圈，填充颜色
+ *    - 绘制文字：上半部文字从外向内读，下半部翻转180°确保始终可读
+ * 3. 绘制中心圆（渐变 + "GO" 文字）
+ *
+ * 文字方向处理：
+ * - 扇区中点角度在 90°~270°（下半部）→ 翻转180°，文字从左侧外向内读
+ * - 扇区中点角度在 0°~90° 或 270°~360°（上半部）→ 正常方向，文字从右侧外向内读
+ */
 function drawWheel() {
   if (!wheelCtx || wheelState.items.length === 0) return;
 
@@ -748,6 +806,23 @@ function drawWheel() {
 }
 
 // ==================== SPINNING ====================
+
+/**
+ * 执行转盘旋转动画
+ *
+ * 动画流程：
+ * 1. 随机选中一个目标扇区 randomIndex
+ * 2. 计算目标角度：使该扇区中心对准指针位置（顶部 -π/2）
+ * 3. 加上扇区内随机偏移（±30%扇区宽度），避免总是停在扇区正中间
+ * 4. 加上 5~9 圈随机旋转，增强视觉随机感
+ * 5. 使用 cubic ease-out 缓动函数（t=1-(1-t)³），模拟物理减速：
+ *    - 刚开始快速旋转，越接近目标越慢
+ * 6. 动画时长 4~5 秒随机，增强不确定性
+ * 7. 动画结束后调用 getWheelResult 确定中奖项
+ *
+ * @requires wheelState.items - 转盘选项列表
+ * @modifies wheelState.currentAngle, wheelState.isSpinning
+ */
 function spinWheel() {
   if (wheelState.isSpinning || wheelState.items.length === 0) return;
 
@@ -819,6 +894,15 @@ function spinWheel() {
   wheelState.animationId = requestAnimationFrame(animate);
 }
 
+/**
+ * 确定中奖结果
+ *
+ * 算法：指针固定在顶部（角度 = 3π/2），遍历所有扇区，
+ * 判断当前旋转角度下指针落在哪个扇区范围内。
+ * 需要处理扇区跨越 0 弧度边界的情况。
+ *
+ * @modifies wheelState.resultItem
+ */
 function getWheelResult() {
   const n = wheelState.items.length;
   if (n === 0) return;
