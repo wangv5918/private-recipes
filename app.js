@@ -1591,6 +1591,9 @@ function openRecipeForm(recipe = null) {
   const titleEl = document.getElementById('recipeFormTitle');
   const submitBtn = document.getElementById('recipeFormSubmit');
 
+  // 隐藏计时器，防止遮挡表单保存按钮
+  document.getElementById('timerWidget').style.display = 'none';
+
   if (recipe) {
     titleEl.textContent = '编辑菜谱';
     submitBtn.textContent = '更新菜谱';
@@ -1629,6 +1632,8 @@ function openRecipeForm(recipe = null) {
 function closeRecipeForm() {
   document.getElementById('recipeFormOverlay').classList.remove('show');
   document.body.style.overflow = '';
+  // 恢复计时器显示
+  document.getElementById('timerWidget').style.display = '';
 }
 
 function parseFormData(form) {
