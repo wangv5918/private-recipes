@@ -73,6 +73,7 @@ let state = {
   activeParentCategory: 'all',  // parent category id
   activeChildCategory: null,
   openCategories: new Set(categoryTree.map(c => c.id)), // all open by default
+  showFavsOnly: false,          // 是否只显示收藏
 };
 
 // ==================== SIDEBAR ====================
@@ -276,7 +277,10 @@ function renderResults() {
 
     html += `
       <div class="recipe-card" data-id="${r.id}" style="animation-delay:${i * 0.02}s">
-        <div class="card-title">${highlightText(r.title, state.searchKeyword)}</div>
+        <div class="card-title-row">
+          <span class="card-title">${highlightText(r.title, state.searchKeyword)}</span>
+          <button class="fav-btn fav-btn-inline${isFaved(r.id) ? ' faved' : ''}" data-id="${r.id}" title="收藏">${isFaved(r.id) ? '❤️' : '🤍'}</button>
+        </div>
         <div class="card-meta-row">
           <span class="card-meta ${diffClass}">${diffEmoji} ${r.difficulty || '中等'}</span>
           <span class="card-meta">⏱ ${r.cookingTime || '?'}分钟</span>
@@ -294,10 +298,23 @@ function renderResults() {
   container.innerHTML = html;
 
   container.querySelectorAll('.recipe-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      // 不拦截收藏按钮点击
+      if (e.target.closest('.fav-btn')) return;
       const id = parseInt(card.dataset.id);
       const recipe = recipes.find(r => r.id === id);
       if (recipe) showModal(recipe);
+    });
+  });
+
+  // 收藏按钮点击事件
+  container.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      toggleFav(id);
+      updateFavUI();
+      renderResults();
     });
   });
 }
@@ -312,13 +329,20 @@ function showModal(recipe) {
   let html = `
     <button class="modal-close" id="modalClose">✕</button>
     <div class="modal-inner">
-      <h2 class="modal-title">${recipe.title}</h2>
+      <div class="modal-title-row">
+        <h2 class="modal-title">${recipe.title}</h2>
+        <button class="fav-btn${isFaved(recipe.id) ? ' faved' : ''}" id="modalFavBtn" data-id="${recipe.id}" title="收藏">${isFaved(recipe.id) ? '❤️' : '🤍'}</button>
+      </div>
       <div class="modal-meta">
         <span>${diffEmoji} ${recipe.difficulty || '中等'}</span>
         <span>⏱ ${recipe.cookingTime || '?'} 分钟</span>
         <span>👥 ${recipe.servings || '2-3人份'}</span>
         <span>📂 ${recipe.category} / ${recipe.subcategory}</span>
         ${hasIng ? `<span>🛒 ${recipe.ingredients.length} 种食材</span>` : ''}
+      </div>
+      <div class="modal-actions">
+        ${hasIng ? `<button class="add-shopping-btn" id="modalShoppingBtn" data-id="${recipe.id}">🛒 加入清单</button>` : ''}
+        <button class="modal-timer-trigger" id="modalTimerBtn" data-id="${recipe.id}">⏱ 开始计时</button>
       </div>`;
 
   // 食材清单
@@ -420,6 +444,40 @@ function showModal(recipe) {
   modal.scrollTop = 0;
 
   document.getElementById('modalClose').addEventListener('click', closeModal);
+
+  // 弹窗内收藏按钮
+  const modalFavBtn = document.getElementById('modalFavBtn');
+  if (modalFavBtn) {
+    modalFavBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(modalFavBtn.dataset.id);
+      toggleFav(id);
+      updateFavUI();
+      // 更新弹窗内按钮状态
+      modalFavBtn.classList.toggle('faved', isFaved(id));
+      modalFavBtn.innerHTML = isFaved(id) ? '❤️' : '🤍';
+    });
+  }
+
+  // 弹窗内加入清单按钮
+  const modalShoppingBtn = document.getElementById('modalShoppingBtn');
+  if (modalShoppingBtn) {
+    modalShoppingBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      addToShoppingList(recipe);
+    });
+  }
+
+  // 弹窗内计时按钮
+  const modalTimerBtn = document.getElementById('modalTimerBtn');
+  if (modalTimerBtn) {
+    modalTimerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('timerModalName').value = recipe.title;
+      document.getElementById('timerModalMinutes').value = recipe.cookingTime || 30;
+      openTimerModal();
+    });
+  }
 }
 
 function closeModal() {
@@ -430,9 +488,6 @@ function closeModal() {
 // ==================== EVENTS ====================
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
-});
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
 });
 
 const searchInput = document.getElementById('searchInput');
@@ -983,8 +1038,14 @@ wheelOverlay.addEventListener('click', function(e) {
   if (e.target === wheelOverlay) closeWheel();
 });
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && wheelOverlay.classList.contains('show')) {
-    closeWheel();
+  if (e.key === 'Escape') {
+    if (wheelOverlay.classList.contains('show')) {
+      closeWheel();
+    } else if (document.getElementById('shoppingPanel').classList.contains('open')) {
+      closeShoppingPanel();
+    } else {
+      closeModal();
+    }
   }
 });
 
@@ -1036,5 +1097,388 @@ wheelCustomInput.addEventListener('keydown', function(e) {
   }
 });
 
+// ==================== DARK MODE ====================
+/**
+ * 深色模式管理
+ * - 自动检测系统偏好
+ * - 手动切换并持久化到 localStorage
+ * - 切换时更新图标
+ */
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  applyTheme(theme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) {
+    toggle.textContent = theme === 'dark' ? '☀️' : '🌓';
+  }
+  localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+// 监听系统主题变化
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  if (!localStorage.getItem('theme')) {
+    applyTheme(e.matches ? 'dark' : 'light');
+  }
+});
+
+// ==================== FAVORITES ====================
+/**
+ * 收藏夹管理
+ * - 存储在 localStorage 的 favs 数组中
+ * - 支持切换收藏、筛选收藏、更新UI
+ */
+let favs = JSON.parse(localStorage.getItem('favs') || '[]');
+
+function isFaved(id) { return favs.includes(id); }
+
+function toggleFav(id) {
+  const idx = favs.indexOf(id);
+  if (idx > -1) favs.splice(idx, 1);
+  else favs.push(id);
+  localStorage.setItem('favs', JSON.stringify(favs));
+}
+
+function updateFavUI() {
+  const count = favs.length;
+  const badge = document.getElementById('favFilterBadge');
+  const countEl = document.getElementById('favFilterCount');
+  if (count > 0) {
+    badge.style.display = 'flex';
+    countEl.textContent = count;
+    badge.classList.toggle('active', state.showFavsOnly);
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// 收藏筛选
+document.getElementById('favFilterBadge').addEventListener('click', function() {
+  state.showFavsOnly = !state.showFavsOnly;
+  this.classList.toggle('active', state.showFavsOnly);
+  renderResults();
+});
+
+// 在 getFilteredRecipes 中增加收藏筛选
+const origGetFilteredRecipes = getFilteredRecipes;
+getFilteredRecipes = function() {
+  let filtered = origGetFilteredRecipes();
+  if (state.showFavsOnly) {
+    filtered = filtered.filter(r => favs.includes(r.id));
+  }
+  return filtered;
+};
+
+// ==================== TIMER ====================
+/**
+ * 烹饪计时器
+ * - 支持多个并发计时器
+ * - 每个计时器独立倒计时
+ * - 完成后播放提示音 + 视觉闪烁
+ * - 折叠/展开小部件
+ */
+const timers = [];
+let timerInterval = null;
+
+function renderTimers() {
+  const body = document.getElementById('timerWidgetBody');
+  const countEl = document.getElementById('timerCount');
+  const activeTimers = timers.filter(t => !t.done);
+  countEl.textContent = activeTimers.length;
+
+  if (timers.length === 0) {
+    body.innerHTML = '<button class="timer-add-btn" id="timerAddBtn">+ 添加计时</button>';
+    document.getElementById('timerAddBtn').addEventListener('click', openTimerModal);
+    return;
+  }
+
+  let html = timers.map((t, i) => {
+    const mins = Math.floor(t.remaining / 60);
+    const secs = t.remaining % 60;
+    const display = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    const statusClass = t.done ? ' done' : (t.running ? ' running' : '');
+    const playPauseIcon = t.done ? '✅' : (t.running ? '⏸' : '▶');
+    const playPauseClass = t.done ? 'del' : (t.running ? 'pause' : 'play');
+    return `
+      <div class="timer-item${statusClass}" data-idx="${i}">
+        <span class="timer-name">${t.name}</span>
+        <span class="timer-display">${t.done ? '完成!' : display}</span>
+        <div class="timer-actions">
+          ${!t.done ? `<button class="timer-btn ${playPauseClass}" data-action="toggle" data-idx="${i}">${playPauseIcon}</button>` : ''}
+          <button class="timer-btn del" data-action="delete" data-idx="${i}">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  html += '<button class="timer-add-btn" id="timerAddBtn">+ 添加计时</button>';
+  body.innerHTML = html;
+
+  document.getElementById('timerAddBtn').addEventListener('click', openTimerModal);
+  body.querySelectorAll('.timer-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      const idx = parseInt(btn.dataset.idx);
+      if (action === 'toggle') toggleTimer(idx);
+      else if (action === 'delete') deleteTimer(idx);
+    });
+  });
+}
+
+function startTimerLoop() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    let hasRunning = false;
+    timers.forEach((t) => {
+      if (t.running && t.remaining > 0) {
+        t.remaining--;
+        if (t.remaining <= 0) {
+          t.running = false;
+          t.done = true;
+          playTimerAlert();
+        }
+        hasRunning = true;
+      }
+    });
+    renderTimers();
+    if (!hasRunning && timers.every(t => t.done)) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }, 1000);
+}
+
+function playTimerAlert() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [800, 1000, 1200].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq; osc.type = 'sine';
+      gain.gain.value = 0.3;
+      osc.start(ctx.currentTime + i * 0.2);
+      osc.stop(ctx.currentTime + i * 0.2 + 0.15);
+    });
+  } catch (e) { /* 忽略音频错误 */ }
+}
+
+function toggleTimer(idx) {
+  const t = timers[idx];
+  if (!t || t.done) return;
+  t.running = !t.running;
+  if (t.running) startTimerLoop();
+  renderTimers();
+}
+
+function deleteTimer(idx) {
+  timers.splice(idx, 1);
+  renderTimers();
+}
+
+function openTimerModal() {
+  document.getElementById('timerModal').style.display = 'flex';
+  document.getElementById('timerModalMinutes').focus();
+}
+
+function closeTimerModal() {
+  document.getElementById('timerModal').style.display = 'none';
+}
+
+function addTimer() {
+  const name = document.getElementById('timerModalName').value.trim() || '计时';
+  const minutes = parseInt(document.getElementById('timerModalMinutes').value) || 5;
+  timers.push({ name, remaining: minutes * 60, running: true, done: false });
+  closeTimerModal();
+  startTimerLoop();
+  renderTimers();
+  // 展开计时器面板
+  document.getElementById('timerWidget').classList.remove('collapsed');
+}
+
+// Timer widget toggle
+document.getElementById('timerWidgetHeader').addEventListener('click', () => {
+  document.getElementById('timerWidget').classList.toggle('collapsed');
+});
+
+// Timer modal events
+document.getElementById('timerModalCancel').addEventListener('click', closeTimerModal);
+document.getElementById('timerModalConfirm').addEventListener('click', addTimer);
+document.getElementById('timerModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTimerModal();
+});
+document.getElementById('timerModalMinutes').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addTimer();
+});
+
+// ==================== SHOPPING LIST ====================
+/**
+ * 购物清单
+ * - 从菜谱详情添加食材到清单
+ * - 相同食材自动合并，用量用逗号连接
+ * - 记录来源菜谱，支持勾选已购
+ * - 一键复制清单到剪贴板
+ */
+let shoppingList = JSON.parse(localStorage.getItem('shoppingList') || '[]');
+
+function addToShoppingList(recipe) {
+  if (!recipe.ingredients || recipe.ingredients.length === 0) return;
+
+  recipe.ingredients.forEach(ing => {
+    const existing = shoppingList.find(item =>
+      item.name === ing.name && !item.checked
+    );
+    if (existing) {
+      // 合并用量
+      const amounts = new Set(existing.amount.split('、'));
+      if (ing.amount) amounts.add(ing.amount);
+      existing.amount = [...amounts].join('、');
+      // 合并来源
+      const froms = new Set(existing.from.split('、'));
+      froms.add(recipe.title);
+      existing.from = [...froms].join('、');
+    } else {
+      shoppingList.push({
+        name: ing.name,
+        amount: ing.amount || '',
+        from: recipe.title,
+        checked: false,
+      });
+    }
+  });
+
+  saveShoppingList();
+  renderShoppingList();
+  openShoppingPanel();
+}
+
+function saveShoppingList() {
+  localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+  updateShoppingBadge();
+}
+
+function updateShoppingBadge() {
+  const unchecked = shoppingList.filter(i => !i.checked).length;
+  document.getElementById('shoppingCount').textContent = unchecked;
+}
+
+function toggleShoppingItem(idx) {
+  shoppingList[idx].checked = !shoppingList[idx].checked;
+  saveShoppingList();
+  renderShoppingList();
+}
+
+function clearShoppingList() {
+  if (confirm('确定清空购物清单？')) {
+    shoppingList = [];
+    saveShoppingList();
+    renderShoppingList();
+  }
+}
+
+function copyShoppingList() {
+  const unchecked = shoppingList.filter(i => !i.checked);
+  if (unchecked.length === 0) {
+    alert('清单已空');
+    return;
+  }
+  const text = unchecked.map((item, i) =>
+    `${i + 1}. ${item.name}${item.amount ? ' — ' + item.amount : ''}`
+  ).join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    alert('已复制到剪贴板');
+  }).catch(() => {
+    // 降级方案
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('已复制到剪贴板');
+  });
+}
+
+function renderShoppingList() {
+  const body = document.getElementById('shoppingPanelBody');
+  if (shoppingList.length === 0) {
+    body.innerHTML = `
+      <div class="shopping-empty">
+        <div class="empty-icon">🛒</div>
+        <p>清单还是空的<br>在菜谱详情中点击「加入清单」</p>
+      </div>`;
+    return;
+  }
+  body.innerHTML = shoppingList.map((item, i) => `
+    <div class="shopping-item${item.checked ? ' checked' : ''}">
+      <input type="checkbox" ${item.checked ? 'checked' : ''} data-idx="${i}">
+      <div class="shop-info">
+        <div class="shop-name">${item.name}</div>
+        ${item.amount ? `<div class="shop-amount">${item.amount}</div>` : ''}
+        <div class="shop-from">来自：${item.from}</div>
+      </div>
+    </div>
+  `).join('');
+
+  body.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      toggleShoppingItem(parseInt(this.dataset.idx));
+    });
+  });
+  updateShoppingBadge();
+}
+
+function openShoppingPanel() {
+  document.getElementById('shoppingPanel').classList.add('open');
+  document.getElementById('shoppingBackdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShoppingPanel() {
+  document.getElementById('shoppingPanel').classList.remove('open');
+  document.getElementById('shoppingBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Shopping events
+document.getElementById('shoppingBadge').addEventListener('click', openShoppingPanel);
+document.getElementById('shoppingPanelClose').addEventListener('click', closeShoppingPanel);
+document.getElementById('shoppingBackdrop').addEventListener('click', closeShoppingPanel);
+document.getElementById('shoppingClearAll').addEventListener('click', clearShoppingList);
+document.getElementById('shoppingCopy').addEventListener('click', copyShoppingList);
+
+// 初始化购物清单UI
+renderShoppingList();
+
+// ==================== PWA ====================
+/**
+ * PWA 离线支持
+ * - 注册 Service Worker 缓存静态资源
+ * - 支持离线访问和添加到主屏幕
+ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered:', reg.scope);
+    }).catch(err => {
+      console.log('SW registration failed:', err);
+    });
+  });
+}
+
 // ==================== INIT ====================
+initTheme();
+updateFavUI();
 loadRecipes();

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e07b39">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
 <title>私房菜谱 - 美味检索</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap&subset=chinese-simplified" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -47,12 +49,15 @@
       <button class="wheel-entry-btn" id="wheelEntryBtn" title="今日菜谱轮盘抽奖">
         <span class="btn-icon">🎰</span> 今日菜谱
       </button>
+      <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">🌓</button>
     </div>
 
     <div class="filter-row">
       <div class="stat-badge">共 <strong id="totalCount">0</strong> 道</div>
       <div class="stat-badge">找到 <strong id="filteredCount">0</strong> 道</div>
       <div class="filter-tags" id="filterTags"></div>
+      <div class="fav-badge" id="favFilterBadge" style="display:none" title="只看收藏">❤️ 收藏 <strong id="favFilterCount">0</strong></div>
+      <div class="shopping-badge" id="shoppingBadge" title="购物清单">🛒 清单 <strong id="shoppingCount">0</strong></div>
     </div>
 
     <div class="results-area" id="resultsArea">
@@ -197,6 +202,51 @@
 <!-- Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-content" id="modalContent"></div>
+</div>
+
+<!-- Shopping Backdrop -->
+<div class="shopping-backdrop" id="shoppingBackdrop"></div>
+
+<!-- Shopping Panel -->
+<div class="shopping-panel" id="shoppingPanel">
+  <div class="shopping-panel-header">
+    <h3>🛒 购物清单</h3>
+    <button class="shopping-panel-close" id="shoppingPanelClose">✕</button>
+  </div>
+  <div class="shopping-panel-body" id="shoppingPanelBody">
+    <div class="shopping-empty">
+      <div class="empty-icon">🛒</div>
+      <p>清单还是空的<br>在菜谱详情中点击「加入清单」</p>
+    </div>
+  </div>
+  <div class="shopping-panel-footer">
+    <button class="shopping-clear-btn" id="shoppingClearAll">清空全部</button>
+    <button class="shopping-copy-btn" id="shoppingCopy">📋 复制清单</button>
+  </div>
+</div>
+
+<!-- Timer Widget -->
+<div class="timer-widget collapsed" id="timerWidget">
+  <div class="timer-widget-header" id="timerWidgetHeader">
+    <h4>⏱ 计时器</h4>
+    <span class="timer-count" id="timerCount">0</span>
+  </div>
+  <div class="timer-widget-body" id="timerWidgetBody">
+    <button class="timer-add-btn" id="timerAddBtn">+ 添加计时</button>
+  </div>
+</div>
+
+<!-- Timer Add Modal -->
+<div class="timer-modal-overlay" id="timerModal" style="display:none">
+  <div class="timer-modal">
+    <h4>添加计时器</h4>
+    <input type="text" id="timerModalName" placeholder="计时名称（如：焖鸡腿）" maxlength="20">
+    <input type="number" id="timerModalMinutes" placeholder="分钟数" min="1" max="180" value="5">
+    <div class="timer-modal-actions">
+      <button class="btn-cancel" id="timerModalCancel">取消</button>
+      <button class="btn-confirm" id="timerModalConfirm">开始计时</button>
+    </div>
+  </div>
 </div>
 
 <script src="app.js" defer></script>

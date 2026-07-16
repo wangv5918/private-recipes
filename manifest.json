@@ -1,0 +1,17 @@
+{
+  "name": "私房菜谱",
+  "short_name": "私房菜谱",
+  "description": "306道私房菜谱，支持搜索、分类、转盘抽奖",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fefaf3",
+  "theme_color": "#e07b39",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
