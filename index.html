@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>私房菜谱 - 美味检索</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap&subset=chinese-simplified" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+<style>
+/* ========== Reset & Variables ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #fefaf3;
+  --bg-card: #fffdf9;
+  --bg-warm: #fff7ed;
+  --text: #3d2c1e;
+  --text-secondary: #7a6652;
+  --text-muted: #b8a590;
+  --accent: #e07b39;
+  --accent-light: #fef0e5;
+  --accent-glow: rgba(224,123,57,0.18);
+  --green: #5a9e6f;
+  --green-light: #edf7f0;
+  --red: #d44a4a;
+  --red-light: #fef0f0;
+  --border: #e8ddd0;
+  --border-light: #f2ebe2;
+  --shadow-sm: 0 1px 4px rgba(60,30,10,0.04);
+  --shadow-md: 0 4px 20px rgba(60,30,10,0.07);
+  --shadow-lg: 0 12px 40px rgba(60,30,10,0.10);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --sidebar-w: 260px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ========== Background Decor ========== */
+.bg-decor {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 85% 15%, rgba(224,123,57,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 15% 85%, rgba(90,158,111,0.04) 0%, transparent 60%);
+}
+
+/* ========== Layout ========== */
+.app { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+/* ========== Sidebar ========== */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--border-light);
+  display: flex; flex-direction: column;
+  z-index: 10; transition: transform var(--transition);
+}
+.sidebar-header {
+  padding: 24px 20px 18px;
+  border-bottom: 1px solid var(--border-light);
+}
+.sidebar-logo { display: flex; align-items: center; gap: 10px; }
+.sidebar-logo .icon-box {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.sidebar-logo h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 19px; font-weight: 700;
+  color: var(--text); letter-spacing: 0.5px;
+}
+.sidebar-logo span { color: var(--accent); }
+
+.sidebar-nav {
+  flex: 1; overflow-y: auto; padding: 12px 10px;
+}
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Category Tree */
+.tree-group { margin-bottom: 2px; }
+.tree-parent {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text); transition: all var(--transition);
+  user-select: none;
+}
+.tree-parent:hover { background: var(--accent-light); color: var(--accent); }
+.tree-parent.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.tree-parent .arrow {
+  width: 18px; height: 18px; transition: transform var(--transition);
+  flex-shrink: 0; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+}
+.tree-parent.open .arrow { transform: rotate(90deg); }
+.tree-parent .count {
+  margin-left: auto; font-size: 11px; color: var(--text-muted);
+  background: var(--bg-warm); padding: 2px 8px;
+  border-radius: 10px; font-weight: 400;
+}
+.tree-children { overflow: hidden; max-height: 0; transition: max-height 0.35s ease; }
+.tree-children.open { max-height: 600px; }
+.tree-child {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px 8px 46px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13px; color: var(--text-secondary);
+  transition: all var(--transition); user-select: none;
+}
+.tree-child:hover { background: var(--accent-light); color: var(--accent); }
+.tree-child.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.tree-child .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0;
+  transition: all var(--transition);
+}
+.tree-child.active .dot, .tree-child:hover .dot { background: var(--accent); }
+
+/* ========== Main ========== */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  padding: 20px 28px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+}
+.menu-toggle {
+  display: none; width: 38px; height: 38px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-card); cursor: pointer;
+  align-items: center; justify-content: center;
+  color: var(--text); transition: all var(--transition); flex-shrink: 0;
+}
+.menu-toggle:hover { background: var(--accent-light); }
+
+.search-wrapper { flex: 1; max-width: 560px; position: relative; }
+.search-box {
+  display: flex; align-items: center;
+  background: var(--bg-card); border: 1.5px solid var(--border);
+  border-radius: 50px; padding: 3px;
+  transition: all var(--transition); box-shadow: var(--shadow-sm);
+}
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow), var(--shadow-md);
+}
+.search-box .search-icon {
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); flex-shrink: 0;
+}
+.search-box input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 15px; font-family: inherit; color: var(--text); padding: 8px 4px;
+}
+.search-box input::placeholder { color: var(--text-muted); }
+.search-box .search-clear {
+  width: 32px; height: 32px; border: none; background: none;
+  cursor: pointer; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: all var(--transition);
+  opacity: 0; visibility: hidden; flex-shrink: 0;
+}
+.search-box .search-clear.visible { opacity: 1; visibility: visible; }
+.search-box .search-clear:hover { background: var(--border-light); color: var(--text); }
+
+/* Filter Row */
+.filter-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 28px 14px; flex-shrink: 0; flex-wrap: wrap;
+}
+.stat-badge {
+  font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 14px; background: var(--bg-card);
+  border: 1px solid var(--border-light); border-radius: 50px; white-space: nowrap;
+}
+.stat-badge strong { color: var(--accent); font-weight: 600; }
+.filter-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+.filter-tag {
+  padding: 5px 15px; border-radius: 50px;
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  border: 1.5px solid var(--border); background: var(--bg-card);
+  color: var(--text-secondary); cursor: pointer;
+  transition: all var(--transition); white-space: nowrap;
+}
+.filter-tag:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.filter-tag.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+/* Results Area */
+.results-area { flex: 1; overflow-y: auto; padding: 0 28px 28px; }
+.results-area::-webkit-scrollbar { width: 5px; }
+.results-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+
+.results-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+}
+.results-header h2 { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+
+/* Recipe Cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.recipe-card {
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-md); cursor: pointer;
+  transition: all var(--transition); padding: 20px;
+  display: flex; flex-direction: column;
+}
+.recipe-card:hover {
+  border-color: var(--accent); box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+.card-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; font-weight: 700; color: var(--text);
+  margin-bottom: 8px; line-height: 1.4;
+}
+.card-meta-row {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.card-meta {
+  font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.card-meta.diff-easy { color: var(--green); }
+.card-meta.diff-medium { color: var(--accent); }
+.card-meta.diff-hard { color: var(--red); }
+.card-meta .ing-count { color: var(--accent); font-weight: 600; }
+
+.card-tags {
+  display: flex; gap: 5px; flex-wrap: wrap; margin-top: auto;
+}
+.card-tag {
+  font-size: 11px; padding: 3px 10px;
+  background: var(--bg-warm); color: var(--text-secondary);
+  border-radius: 50px; font-weight: 400;
+}
+.card-no-ing {
+  font-size: 11px; color: var(--text-muted);
+  font-style: italic; margin-top: 6px;
+}
+
+/* No Results */
+.no-results {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.no-results .no-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.no-results h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+.no-results p { font-size: 13px; }
+
+/* ========== Modal ========== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(40,25,10,0.45); backdrop-filter: blur(4px);
+  z-index: 100; display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: all var(--transition);
+}
+.modal-overlay.show { opacity: 1; visibility: visible; }
+.modal-content {
+  background: var(--bg-card); border-radius: var(--radius-lg);
+  width: 92%; max-width: 750px; max-height: 88vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  transform: translateY(20px); transition: transform var(--transition);
+}
+.modal-overlay.show .modal-content { transform: translateY(0); }
+.modal-content::-webkit-scrollbar { width: 5px; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+
+.modal-close {
+  position: sticky; top: 16px; float: right;
+  width: 36px; height: 36px; border: 1px solid var(--border);
+  border-radius: 50%; background: var(--bg-card); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--text-muted); transition: all var(--transition);
+  z-index: 2; margin-right: 16px;
+}
+.modal-close:hover { background: var(--accent-light); color: var(--accent); }
+.modal-inner { padding: 8px 32px 32px; }
+.modal-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 26px; font-weight: 700; color: var(--text);
+  margin-bottom: 12px; line-height: 1.3;
+}
+.modal-meta {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 24px; font-size: 13px; color: var(--text-muted);
+  padding-bottom: 18px; border-bottom: 1px solid var(--border-light);
+}
+.modal-section { margin-bottom: 24px; }
+.modal-section h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent-light);
+  display: flex; align-items: center; gap: 8px;
+}
+.modal-section h3 .section-icon {
+  width: 28px; height: 28px; background: var(--accent-light);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+/* Ingredients Grid */
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+.ingredient-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: var(--bg-warm);
+  border-radius: var(--radius-sm); font-size: 14px;
+}
+.ingredient-item .ing-name { font-weight: 500; color: var(--text); }
+.ingredient-item .ing-amount { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.ingredient-item .ing-note { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+/* Steps */
+.step-phase { margin-bottom: 16px; }
+.step-phase h4 { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.step-list { list-style: none; padding: 0; }
+.step-list li {
+  position: relative; padding: 8px 0 8px 28px;
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.7; border-bottom: 1px dashed var(--border-light);
+}
+.step-list li:last-child { border-bottom: none; }
+.step-list li::before {
+  content: ''; position: absolute; left: 0; top: 14px;
+  width: 8px; height: 8px; background: var(--accent);
+  border-radius: 50%; opacity: 0.5;
+}
+
+/* Tips */
+.tips-list { list-style: none; padding: 0; }
+.tips-list li {
+  padding: 8px 0 8px 24px; font-size: 13px;
+  color: var(--text-secondary); line-height: 1.6; position: relative;
+}
+.tips-list li::before {
+  content: '✦'; position: absolute; left: 0; top: 8px;
+  color: var(--accent); font-size: 10px;
+}
+
+/* Nutrition */
+.nutrition-list { list-style: none; padding: 0; }
+.nutrition-list li {
+  padding: 5px 0 5px 20px; font-size: 13px;
+  color: var(--text-secondary); line-height: 1.6;
+  position: relative;
+}
+.nutrition-list li::before {
+  content: '•'; position: absolute; left: 4px; top: 5px;
+  color: var(--accent);
+}
+
+/* Extra Tables */
+.extra-table-wrap {
+  margin-bottom: 16px; overflow-x: auto;
+}
+.extra-table-wrap table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.extra-table-wrap th, .extra-table-wrap td {
+  border: 1px solid var(--border); padding: 8px 12px;
+  text-align: left; color: var(--text-secondary);
+}
+.extra-table-wrap th {
+  background: var(--bg-warm); font-weight: 600; color: var(--text);
+}
+
+/* Highlight */
+.highlight {
+  background: linear-gradient(180deg, transparent 58%, #ffe0b0 58%);
+  padding: 0 2px; border-radius: 2px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    transform: translateX(-100%); box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .menu-toggle { display: flex; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 14px; }
+  .filter-row { padding-left: 14px; padding-right: 14px; }
+  .results-area { padding: 0 14px 20px; }
+  .modal-inner { padding: 8px 20px 24px; }
+  .ingredients-grid { grid-template-columns: 1fr; }
+}
+
+/* Entry animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.recipe-card { animation: fadeInUp 0.4s ease both; }
+
+/* Skeleton Loader */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-loader {
+  animation: fadeInUp 0.3s ease both;
+}
+.skeleton-header {
+  margin-bottom: 14px;
+}
+.skeleton-title-line {
+  height: 18px;
+  width: 200px;
+  background: linear-gradient(90deg, #f2ebe2 25%, #e8ddd0 50%, #f2ebe2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skeleton-card-title {
+  height: 22px;
+  width: 70%;
+  background: linear-gradient(90deg, #f2ebe2 25%, #e8ddd0 50%, #f2ebe2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+.skeleton-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.skeleton-meta-dot {
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(90deg, #f2ebe2 25%, #e8ddd0 50%, #f2ebe2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 50%;
+}
+.skeleton-meta-line {
+  height: 14px;
+  width: 60px;
+  background: linear-gradient(90deg, #f2ebe2 25%, #e8ddd0 50%, #f2ebe2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+.skeleton-card-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+.skeleton-tag {
+  height: 20px;
+  width: 50px;
+  background: linear-gradient(90deg, #f2ebe2 25%, #e8ddd0 50%, #f2ebe2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 10px;
+}
+@media (max-width: 768px) {
+  .skeleton-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-decor"></div>
+
+<div class="app">
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="favicon.svg" class="icon-box" alt="Logo">
+        <h1>私房<span>菜谱</span></h1>
+      </img>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="菜单">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="search-wrapper">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" id="searchInput" placeholder="搜索菜名、食材、口味..." autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="清除">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="stat-badge">共 <strong id="totalCount">0</strong> 道</div>
+      <div class="stat-badge">找到 <strong id="filteredCount">0</strong> 道</div>
+      <div class="filter-tags" id="filterTags"></div>
+    </div>
+
+    <div class="results-area" id="resultsArea">
+      <div class="skeleton-loader" id="skeletonLoader">
+        <div class="skeleton-header">
+          <div class="skeleton-title-line"></div>
+        </div>
+        <div class="skeleton-grid">
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-card-title"></div>
+            <div class="skeleton-card-meta">
+              <div class="skeleton-meta-dot"></div>
+              <div class="skeleton-meta-line"></div>
+              <div class="skeleton-meta-line"></div>
+            </div>
+            <div class="skeleton-card-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content" id="modalContent"></div>
+</div>
+
+<script>
+// ==================== DATA LOADING ====================
+let recipes = [];
+let fuse = null;
+
+// Build category tree from data
+let categoryTree = []; // [{ id, name, children: [{ id, name, count }], count }]
+let categoryMap = {};  // subcategory -> { parent, name }
+
+async function loadRecipes() {
+  try {
+    const res = await fetch('recipes_full.json');
+    recipes = await res.json();
+    buildCategoryTree();
+    renderSidebar();
+    renderFilterTags();
+    renderResults();
+  } catch (err) {
+    console.error('加载失败:', err);
+    document.getElementById('resultsArea').innerHTML = `
+      <div class="no-results"><div class="no-icon">📖</div><h3>菜谱加载失败</h3><p>请确保 recipes_full.json 文件存在</p></div>`;
+  }
+}
+
+function buildCategoryTree() {
+  const tree = {};
+  recipes.forEach(r => {
+    const parent = r.category || '其他';
+    const child = r.subcategory || '未分类';
+    if (!tree[parent]) tree[parent] = {};
+    if (!tree[parent][child]) tree[parent][child] = 0;
+    tree[parent][child]++;
+  });
+
+  categoryTree = Object.entries(tree).map(([parent, children]) => ({
+    id: parent,
+    name: parent,
+    children: Object.entries(children).map(([child, count]) => ({
+      id: child,
+      name: child,
+      count,
+    })),
+    count: Object.values(children).reduce((a, b) => a + b, 0),
+  }));
+
+  categoryMap = {};
+  categoryTree.forEach(cat => {
+    cat.children.forEach(ch => {
+      categoryMap[ch.id] = { parent: cat.id, name: ch.name };
+    });
+  });
+}
+
+function initFuse() {
+  fuse = new Fuse(recipes, {
+    keys: [
+      { name: 'title', weight: 4 },
+      { name: 'tags', weight: 2 },
+      { name: 'ingredients.name', weight: 2 },
+      { name: 'subcategory', weight: 1 },
+      { name: 'category', weight: 1 },
+    ],
+    threshold: 0.35,
+    distance: 100,
+    includeScore: true,
+    minMatchCharLength: 1,
+  });
+}
+
+// ==================== STATE ====================
+let state = {
+  searchKeyword: '',
+  activeCategory: 'all',        // child category id or 'all'
+  activeParentCategory: 'all',  // parent category id
+  activeChildCategory: null,
+  openCategories: new Set(categoryTree.map(c => c.id)), // all open by default
+};
+
+// ==================== SIDEBAR ====================
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  let html = `
+    <div class="tree-group">
+      <div class="tree-parent${state.activeParentCategory === 'all' && !state.activeChildCategory ? ' active' : ''}"
+           data-category="all" data-type="parent">
+        <span style="font-size:16px;width:18px;text-align:center;">📋</span>
+        <span>全部菜谱</span>
+        <span class="count">${recipes.length}</span>
+      </div>
+    </div>`;
+
+  categoryTree.forEach(cat => {
+    const isOpen = state.openCategories.has(cat.id);
+    const isActive = state.activeParentCategory === cat.id;
+
+    html += `
+      <div class="tree-group">
+        <div class="tree-parent${isOpen ? ' open' : ''}${isActive ? ' active' : ''}"
+             data-category="${cat.id}" data-type="parent">
+          <span class="arrow">▶</span>
+          <span style="font-size:15px;">${cat.name === '家常菜' ? '🍲' : cat.name === '主食' ? '🍚' : '📖'}</span>
+          <span>${cat.name}</span>
+          <span class="count">${cat.count}</span>
+        </div>
+        <div class="tree-children${isOpen ? ' open' : ''}">
+          ${cat.children.map(child => {
+            const isChildActive = state.activeChildCategory === child.id;
+            return `
+              <div class="tree-child${isChildActive ? ' active' : ''}"
+                   data-category="${child.id}" data-parent="${cat.id}" data-type="child">
+                <span class="dot"></span>
+                <span>${child.name}</span>
+                <span class="count" style="margin-left:auto">${child.count}</span>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  });
+
+  nav.innerHTML = html;
+  bindSidebarEvents();
+}
+
+function bindSidebarEvents() {
+  document.querySelectorAll('.tree-parent').forEach(el => {
+    el.addEventListener('click', function() {
+      const catId = this.dataset.category;
+      if (catId === 'all') {
+        state.openCategories = new Set(state.openCategories);
+      } else if (state.openCategories.has(catId)) {
+        state.openCategories.delete(catId);
+      } else {
+        state.openCategories.add(catId);
+      }
+      state.activeParentCategory = catId === 'all' ? 'all' : catId;
+      state.activeChildCategory = null;
+      state.activeCategory = 'all';
+      updateFilterTags();
+      renderSidebar();
+      renderResults();
+    });
+  });
+
+  document.querySelectorAll('.tree-child').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      state.activeChildCategory = this.dataset.category;
+      state.activeParentCategory = this.dataset.parent;
+      state.activeCategory = this.dataset.category;
+      updateFilterTags();
+      renderSidebar();
+      renderResults();
+    });
+  });
+}
+
+// ==================== FILTER TAGS ====================
+function renderFilterTags() {
+  const container = document.getElementById('filterTags');
+  let html = `<button class="filter-tag${state.activeCategory === 'all' ? ' active' : ''}" data-category="all">全部</button>`;
+
+  categoryTree.forEach(cat => {
+    cat.children.forEach(child => {
+      html += `<button class="filter-tag${state.activeCategory === child.id ? ' active' : ''}" data-category="${child.id}">${child.name} (${child.count})</button>`;
+    });
+  });
+
+  container.innerHTML = html;
+  bindFilterTagEvents();
+}
+
+function updateFilterTags() {
+  document.querySelectorAll('.filter-tag').forEach(tag => {
+    tag.classList.toggle('active', tag.dataset.category === state.activeCategory);
+  });
+}
+
+function bindFilterTagEvents() {
+  document.querySelectorAll('.filter-tag').forEach(tag => {
+    tag.addEventListener('click', function() {
+      const catId = this.dataset.category;
+      state.activeCategory = catId;
+      if (catId === 'all') {
+        state.activeParentCategory = 'all';
+        state.activeChildCategory = null;
+      } else {
+        state.activeParentCategory = categoryMap[catId]?.parent || 'all';
+        state.activeChildCategory = catId;
+      }
+      updateFilterTags();
+      renderSidebar();
+      renderResults();
+    });
+  });
+}
+
+// ==================== FILTER ====================
+async function ensureFuseLoaded() {
+  if (typeof Fuse === 'undefined') {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Fuse.js 加载失败'));
+      document.head.appendChild(script);
+    });
+  }
+  return Promise.resolve();
+}
+
+function initFuse() {
+  fuse = new Fuse(recipes, {
+    keys: [
+      { name: 'title', weight: 4 },
+      { name: 'tags', weight: 2 },
+      { name: 'ingredients.name', weight: 2 },
+      { name: 'subcategory', weight: 1 },
+      { name: 'category', weight: 1 },
+    ],
+    threshold: 0.35,
+    distance: 100,
+    includeScore: true,
+    minMatchCharLength: 1,
+  });
+}
+
+function getFilteredRecipes() {
+  let filtered = recipes;
+
+  if (state.searchKeyword.trim() && fuse) {
+    const results = fuse.search(state.searchKeyword.trim());
+    filtered = results.map(r => r.item);
+  }
+
+  if (state.activeCategory !== 'all') {
+    filtered = filtered.filter(r => r.subcategory === state.activeCategory);
+  }
+
+  return filtered;
+}
+
+// ==================== HIGHLIGHT ====================
+function highlightText(text, keyword) {
+  if (!keyword.trim()) return text;
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<span class="highlight">$1</span>');
+}
+
+// ==================== RENDER RESULTS ====================
+function renderResults() {
+  const container = document.getElementById('resultsArea');
+  const filtered = getFilteredRecipes();
+
+  document.getElementById('totalCount').textContent = recipes.length;
+  document.getElementById('filteredCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="no-results">
+        <div class="no-icon">🍽️</div>
+        <h3>没找到相关菜谱</h3>
+        <p>试试换个关键词或调整筛选条件</p>
+      </div>`;
+    return;
+  }
+
+  let html = `
+    <div class="results-header">
+      <h2>${state.searchKeyword ? `搜索「${state.searchKeyword}」的结果` : '全部菜谱'}</h2>
+    </div>
+    <div class="cards-grid">`;
+
+  filtered.forEach((r, i) => {
+    const diffClass = r.difficulty === '简单' ? 'diff-easy' : r.difficulty === '中等' ? 'diff-medium' : 'diff-hard';
+    const diffEmoji = r.difficulty === '简单' ? '🟢' : r.difficulty === '中等' ? '🟠' : '🔴';
+    const hasIng = r.ingredients && r.ingredients.length > 0;
+
+    html += `
+      <div class="recipe-card" data-id="${r.id}" style="animation-delay:${i * 0.02}s">
+        <div class="card-title">${highlightText(r.title, state.searchKeyword)}</div>
+        <div class="card-meta-row">
+          <span class="card-meta ${diffClass}">${diffEmoji} ${r.difficulty || '中等'}</span>
+          <span class="card-meta">⏱ ${r.cookingTime || '?'}分钟</span>
+          <span class="card-meta">👥 ${r.servings || '2-3人份'}</span>
+          ${hasIng ? `<span class="card-meta"><span class="ing-count">${r.ingredients.length}</span> 种食材</span>` : ''}
+        </div>
+        <div class="card-tags">
+          ${(r.tags || []).slice(0, 6).map(t => `<span class="card-tag">${highlightText(t, state.searchKeyword)}</span>`).join('')}
+        </div>
+        ${!hasIng ? '<div class="card-no-ing">⚠ 食材表为图片，暂无文本数据</div>' : ''}
+      </div>`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  container.querySelectorAll('.recipe-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = parseInt(card.dataset.id);
+      const recipe = recipes.find(r => r.id === id);
+      if (recipe) showModal(recipe);
+    });
+  });
+}
+
+// ==================== MODAL ====================
+function showModal(recipe) {
+  const hasIng = recipe.ingredients && recipe.ingredients.length > 0;
+  const hasNutrition = recipe.nutrition && recipe.nutrition.length > 0;
+  const hasExtra = recipe.extra && recipe.extra.length > 0;
+  const diffEmoji = recipe.difficulty === '简单' ? '🟢' : recipe.difficulty === '中等' ? '🟠' : '🔴';
+
+  let html = `
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-inner">
+      <h2 class="modal-title">${recipe.title}</h2>
+      <div class="modal-meta">
+        <span>${diffEmoji} ${recipe.difficulty || '中等'}</span>
+        <span>⏱ ${recipe.cookingTime || '?'} 分钟</span>
+        <span>👥 ${recipe.servings || '2-3人份'}</span>
+        <span>📂 ${recipe.category} / ${recipe.subcategory}</span>
+        ${hasIng ? `<span>🛒 ${recipe.ingredients.length} 种食材</span>` : ''}
+      </div>`;
+
+  // 食材清单
+  if (hasIng) {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">🛒</span> 食材清单</h3>
+        <div class="ingredients-grid">
+          ${recipe.ingredients.map(ing => `
+            <div class="ingredient-item">
+              <span class="ing-name">${ing.name}</span>
+              <span class="ing-amount">${ing.amount}</span>
+              ${ing.note ? `<span class="ing-note">${ing.note}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  } else {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">🛒</span> 食材清单</h3>
+        <p style="color:var(--text-muted);font-style:italic;">⚠ 食材表在飞书文档中为图片格式，无法自动提取文本。请参考原始文档。</p>
+      </div>`;
+  }
+
+  // 详细步骤
+  if (recipe.steps && recipe.steps.length > 0) {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">📝</span> 详细步骤</h3>
+        ${recipe.steps.map(step => `
+          <div class="step-phase">
+            <h4>${step.phase}</h4>
+            <ol class="step-list">
+              ${step.items.map(item => `<li>${item}</li>`).join('')}
+            </ol>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  // 烹饪技巧
+  if (recipe.tips && recipe.tips.length > 0) {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">💡</span> 烹饪技巧</h3>
+        <ul class="tips-list">
+          ${recipe.tips.map(tip => `<li>${tip}</li>`).join('')}
+        </ul>
+      </div>`;
+  }
+
+  // 营养分析
+  if (hasNutrition) {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">🔬</span> 营养分析</h3>
+        <ul class="nutrition-list">
+          ${recipe.nutrition.map(n => `<li>${n}</li>`).join('')}
+        </ul>
+      </div>`;
+  }
+
+  // 额外表格
+  if (hasExtra) {
+    html += `
+      <div class="modal-section">
+        <h3><span class="section-icon">📊</span> 补充信息</h3>
+        ${recipe.extra.map(ext => {
+          if (ext.type === 'table') {
+            return `
+              <div class="extra-table-wrap">
+                <table>
+                  ${ext.rows.map((row, ri) => `
+                    <tr>${row.map(cell => ri === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`).join('')}</tr>
+                  `).join('')}
+                </table>
+              </div>`;
+          }
+          return '';
+        }).join('')}
+      </div>`;
+  }
+
+  // 标签
+  if (recipe.tags && recipe.tags.length > 0) {
+    html += `
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:16px;">
+        ${recipe.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+      </div>`;
+  }
+
+  html += '</div>';
+
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ==================== EVENTS ====================
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+
+searchInput.addEventListener('input', async function() {
+  state.searchKeyword = this.value;
+  searchClear.classList.toggle('visible', this.value.length > 0);
+  if (state.searchKeyword.trim() && !fuse) {
+    try {
+      await ensureFuseLoaded();
+      initFuse();
+    } catch (err) {
+      console.error('Fuse.js 加载失败:', err);
+    }
+  }
+  renderResults();
+});
+searchClear.addEventListener('click', function() {
+  searchInput.value = '';
+  state.searchKeyword = '';
+  searchClear.classList.remove('visible');
+  searchInput.focus();
+  renderResults();
+});
+
+document.getElementById('menuToggle').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('menuToggle');
+  if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+
+// ==================== INIT ====================
+loadRecipes();
+</script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+[
+  {
+    "id": 1,
+    "title": "台湾卤肉饭",
+    "category": "家常菜",
+    "subcategory": "猪肉",
+    "tags": ["卤肉", "台湾", "五花肉", "下饭", "经典"],
+    "difficulty": "中等",
+    "cookingTime": 120,
+    "servings": "3-4人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=authentic+Taiwanese+braised+pork+rice+lu+rou+fan,+steamed+rice+topped+with+glossy+braised+pork+belly+dices,+halved+soy+egg,+blanched+green+vegetables,+dark+rich+soy+sauce+gravy,+overhead+food+photography,+warm+lighting&image_size=square",
+    "ingredients": [
+      { "name": "五花肉", "amount": "500g", "note": "切小丁" },
+      { "name": "红葱头", "amount": "100g", "note": "或用洋葱替代" },
+      { "name": "干香菇", "amount": "5-6朵", "note": "泡发后切丁" },
+      { "name": "鸡蛋", "amount": "4个", "note": "煮熟剥壳" },
+      { "name": "姜", "amount": "3片", "note": "" },
+      { "name": "蒜", "amount": "4瓣", "note": "拍扁" },
+      { "name": "八角", "amount": "2颗", "note": "" },
+      { "name": "米酒", "amount": "2大勺", "note": "" },
+      { "name": "生抽", "amount": "3大勺", "note": "" },
+      { "name": "老抽", "amount": "1大勺", "note": "上色用" },
+      { "name": "冰糖", "amount": "15g", "note": "" },
+      { "name": "白胡椒粉", "amount": "少许", "note": "" },
+      { "name": "食用油", "amount": "适量", "note": "炸红葱用" }
+    ],
+    "steps": [
+      { "phase": "准备工作", "items": [
+        "红葱头（或洋葱）切薄片。锅中放足量油（能没过葱片），冷油下锅，开中小火慢慢炸制，不停翻动，直至葱片变得金黄酥脆。立即捞出沥油，即成红葱酥。炸葱的油（葱油）保留备用。",
+        "五花肉切丁；干香菇泡发后切丁，泡菇水静置澄清备用；鸡蛋煮熟剥壳；姜切片，蒜拍扁。"
+      ]},
+      { "phase": "炒制与炖煮", "items": [
+        "锅中放入少许炸好的葱油，放入五花肉丁，用中小火慢慢煸炒，逼出多余油脂，炒至肉丁表面微焦金黄。可将部分猪油盛出，减少油腻感。",
+        "加入姜片、蒜瓣、八角炒香，接着放入香菇丁翻炒。沿锅边淋入米酒，大火激发出香气。然后加入生抽、老抽、冰糖，翻炒均匀，使肉丁均匀上色。",
+        "倒入泡香菇的水和足量开水，水量需没过所有食材。大火烧开后，转最小火，盖上锅盖慢炖1-1.5小时。中途可放入水煮蛋一同卤制。",
+        "在炖煮结束前5-10分钟，加入大部分炸好的红葱酥，搅拌均匀，继续焖煮，让葱香融入卤汁。"
+      ]},
+      { "phase": "收汁与享用", "items": [
+        "炖煮时间到后，打开锅盖，转中大火收汁。期间需不时搅拌，防止粘底。收至卤汁浓稠、能挂在勺背上即可。切忌收得太干，保留适量卤汁拌饭是精髓。",
+        "尝一下味道，可根据咸度决定是否补少许盐。关火前可撒入剩余的一点红葱酥和白胡椒粉增香。",
+        "碗中盛入热米饭，浇上卤肉和浓稠的卤汁，放上对半切开的卤蛋，旁边配上焯烫过的青菜（如上海青）。"
+      ]}
+    ],
+    "tips": [
+      "自制红葱酥是风味的关键，炸制时需冷油下锅、小火慢炸，耐心至金黄酥脆，避免炸糊发苦",
+      "手切五花肉丁（非肉末）能保留肉的纤维口感，肥肉部分经长时间炖煮会化为胶质",
+      "小火慢炖至少1小时，时间越久肉质越酥烂，使用砂锅保温性更好",
+      "冰糖中和酱油的咸，带来回甘，形成台式卤肉饭「咸甜适中」的经典口味",
+      "卤肉做好后冷藏放置一夜再加热，风味会更加融合醇厚"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "麻婆豆腐",
+    "category": "家常菜",
+    "subcategory": "豆腐",
+    "tags": ["麻辣", "豆腐", "川菜", "下饭", "快手"],
+    "difficulty": "简单",
+    "cookingTime": 20,
+    "servings": "2-3人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=authentic+Mapo+Tofu,+silky+tofu+cubes+in+spicy+red+chili+oil+sauce+with+minced+pork,+sichuan+peppercorns,+green+scallions,+steaming+hot+in+stone+bowl,+overhead+shot&image_size=square",
+    "ingredients": [
+      { "name": "嫩豆腐", "amount": "1盒", "note": "切2cm方块" },
+      { "name": "猪肉末", "amount": "100g", "note": "" },
+      { "name": "郫县豆瓣酱", "amount": "1.5大勺", "note": "剁细" },
+      { "name": "豆豉", "amount": "1小勺", "note": "切碎" },
+      { "name": "花椒粉", "amount": "1小勺", "note": "" },
+      { "name": "蒜末", "amount": "2瓣", "note": "" },
+      { "name": "姜末", "amount": "1小勺", "note": "" },
+      { "name": "葱花", "amount": "适量", "note": "" },
+      { "name": "水淀粉", "amount": "适量", "note": "勾芡用" },
+      { "name": "生抽", "amount": "1小勺", "note": "" }
+    ],
+    "steps": [
+      { "phase": "准备", "items": [
+        "豆腐切2cm方块，放入加盐的沸水中焯烫1分钟，捞出沥干备用。这一步可去豆腥味并使豆腐更嫩不易碎。",
+        "郫县豆瓣酱剁细，豆豉切碎，蒜姜切末，葱切葱花。"
+      ]},
+      { "phase": "炒制", "items": [
+        "锅中放油，中小火煸炒猪肉末至变色出油，盛出备用。",
+        "锅中留底油，放入豆瓣酱小火炒出红油，加入豆豉、蒜末、姜末炒香。",
+        "加入适量清水或高汤，放入生抽，大火烧开。",
+        "轻轻放入豆腐块，不要翻动，晃动锅子使豆腐均匀浸入汤汁，小火煮3分钟入味。",
+        "分两次淋入水淀粉勾芡，轻轻推动豆腐使芡汁均匀包裹。",
+        "撒入花椒粉和葱花，出锅装盘。"
+      ]}
+    ],
+    "tips": [
+      "豆腐焯水时加盐可让豆腐更紧实不易碎",
+      "豆瓣酱一定要小火炒出红油，这是「麻婆」色泽的关键",
+      "勾芡时分两次，第一次薄芡使味道附着，第二次厚芡收汁",
+      "花椒粉最后撒入，保持麻味的鲜劲"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "糖醋排骨",
+    "category": "家常菜",
+    "subcategory": "猪肉",
+    "tags": ["糖醋", "排骨", "酸甜", "宴客", "经典"],
+    "difficulty": "中等",
+    "cookingTime": 45,
+    "servings": "3-4人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese+sweet+and+sour+spare+ribs,+glossy+dark+amber+glaze+coating+each+rib,+sesame+seeds+and+green+onion+garnish,+white+ceramic+plate,+warm+restaurant+lighting,+overhead+food+photography&image_size=square",
+    "ingredients": [
+      { "name": "猪小排", "amount": "500g", "note": "剁成小段" },
+      { "name": "料酒", "amount": "1大勺", "note": "" },
+      { "name": "生抽", "amount": "2大勺", "note": "" },
+      { "name": "老抽", "amount": "0.5大勺", "note": "" },
+      { "name": "香醋", "amount": "3大勺", "note": "" },
+      { "name": "白糖", "amount": "3大勺", "note": "" },
+      { "name": "姜", "amount": "3片", "note": "" },
+      { "name": "白芝麻", "amount": "少许", "note": "装饰" }
+    ],
+    "steps": [
+      { "phase": "处理排骨", "items": [
+        "排骨冷水下锅，加入姜片和料酒，大火煮开后撇去浮沫，捞出洗净沥干。",
+        "调糖醋汁：1勺料酒 + 2勺生抽 + 3勺香醋 + 3勺白糖（黄金比例1:2:3:3），搅拌均匀备用。"
+      ]},
+      { "phase": "烹制", "items": [
+        "锅中放少许油，放入排骨中小火煎至两面金黄。",
+        "倒入调好的糖醋汁，翻炒均匀使每块排骨裹上酱汁。",
+        "加入没过排骨的开水，大火烧开后转小火，盖上锅盖焖煮30分钟。",
+        "开盖转大火收汁，不断翻炒，待汤汁浓稠能挂在排骨上即可。",
+        "出锅撒白芝麻和葱花点缀。"
+      ]}
+    ],
+    "tips": [
+      "糖醋汁黄金比例：1料酒:2生抽:3醋:3糖，记住1233即可",
+      "收汁时一定要不断翻炒，糖分高容易糊锅",
+      "选带软骨的小排口感最佳，纯瘦肉会偏柴"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "番茄炒蛋",
+    "category": "家常菜",
+    "subcategory": "蛋类",
+    "tags": ["快手", "番茄", "鸡蛋", "入门", "下饭"],
+    "difficulty": "简单",
+    "cookingTime": 10,
+    "servings": "2人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese+stir+fried+tomato+and+scrambled+eggs,+soft+fluffy+egg+pieces+with+juicy+tomato+chunks+in+light+sauce,+home+style,+white+bowl,+warm+natural+light,+overhead+shot&image_size=square",
+    "ingredients": [
+      { "name": "番茄", "amount": "2个", "note": "切块" },
+      { "name": "鸡蛋", "amount": "3个", "note": "" },
+      { "name": "葱花", "amount": "适量", "note": "" },
+      { "name": "盐", "amount": "适量", "note": "" },
+      { "name": "白糖", "amount": "1小勺", "note": "提鲜" },
+      { "name": "食用油", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      { "phase": "准备", "items": [
+        "番茄顶部划十字，用开水烫一下去皮，切小块。",
+        "鸡蛋打散，加少许盐搅匀。"
+      ]},
+      { "phase": "烹制", "items": [
+        "热锅凉油，油温八成热时倒入蛋液，用筷子快速划散，蛋液凝固成块后立即盛出（不要炒老）。",
+        "锅中再放少许油，放入番茄块，中火炒出汁水，用铲子按压帮助出汁。",
+        "番茄出汁后加入白糖、少许盐调味。",
+        "倒入炒好的鸡蛋，快速翻炒均匀，让鸡蛋吸收番茄汁。",
+        "撒葱花出锅。"
+      ]}
+    ],
+    "tips": [
+      "番茄去皮后口感更好，嫌麻烦也可不去",
+      "鸡蛋不要炒太老，凝固即可盛出，最后回锅吸收汤汁",
+      "加少许白糖能中和番茄的酸，提升鲜味",
+      "番茄选熟透的更容易出汁，如果番茄太生可加少许番茄酱"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "清蒸鲈鱼",
+    "category": "家常菜",
+    "subcategory": "海鲜",
+    "tags": ["清蒸", "鱼", "宴客", "健康", "粤菜"],
+    "difficulty": "中等",
+    "cookingTime": 25,
+    "servings": "2-3人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese+steamed+whole+sea+bass+with+ginger+and+scallions,+soy+sauce+drizzled,+fresh+herbs,+elegant+white+ceramic+plate,+steam+rising,+overhead+food+photography+on+dark+table&image_size=square",
+    "ingredients": [
+      { "name": "鲈鱼", "amount": "1条", "note": "约500g，处理干净" },
+      { "name": "姜", "amount": "1块", "note": "切片+切丝" },
+      { "name": "葱", "amount": "3根", "note": "切段+切丝" },
+      { "name": "蒸鱼豉油", "amount": "2大勺", "note": "" },
+      { "name": "料酒", "amount": "1大勺", "note": "" },
+      { "name": "食用油", "amount": "2大勺", "note": "最后淋油用" }
+    ],
+    "steps": [
+      { "phase": "处理鱼", "items": [
+        "鲈鱼洗净，在鱼身两面各划三刀，抹上料酒和少许盐腌制10分钟。",
+        "盘底铺姜片和葱段，放上鱼，鱼身上再放姜片。"
+      ]},
+      { "phase": "蒸制", "items": [
+        "蒸锅水烧开后，放入鱼盘，大火蒸8-10分钟（根据鱼的大小调整）。",
+        "蒸好后倒掉盘中蒸出的腥水，去掉鱼身上的姜片。",
+        "鱼身上重新铺上新鲜的姜丝和葱丝。"
+      ]},
+      { "phase": "淋油", "items": [
+        "锅中烧热油至冒烟，均匀淋在姜葱丝上，激发出香味。",
+        "沿盘边淋入蒸鱼豉油即可上桌。"
+      ]}
+    ],
+    "tips": [
+      "蒸鱼一定要等水开后再入锅，大火蒸，时间不宜过长否则肉老",
+      "蒸出的腥水一定要倒掉，这是去腥关键",
+      "淋热油时油温要够高，听到「滋啦」声才对",
+      "判断鱼是否熟：筷子能轻松插入鱼身最厚处即为熟"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "红烧牛肉面",
+    "category": "主食",
+    "subcategory": "面食",
+    "tags": ["牛肉", "面", "红烧", "台湾", "暖身"],
+    "difficulty": "中等",
+    "cookingTime": 120,
+    "servings": "4人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Taiwanese+braised+beef+noodle+soup,+tender+beef+chunks+in+rich+dark+broth+with+hand+pulled+noodles,+bok+choy,+pickled+mustard+greens,+steaming+hot+in+large+bowl,+warm+lighting&image_size=square",
+    "ingredients": [
+      { "name": "牛腱子肉", "amount": "600g", "note": "切大块" },
+      { "name": "面条", "amount": "适量", "note": "宽面或拉面" },
+      { "name": "番茄", "amount": "1个", "note": "切块" },
+      { "name": "洋葱", "amount": "半个", "note": "切块" },
+      { "name": "姜", "amount": "5片", "note": "" },
+      { "name": "蒜", "amount": "4瓣", "note": "" },
+      { "name": "八角", "amount": "2颗", "note": "" },
+      { "name": "桂皮", "amount": "1小段", "note": "" },
+      { "name": "香叶", "amount": "2片", "note": "" },
+      { "name": "郫县豆瓣酱", "amount": "1大勺", "note": "" },
+      { "name": "生抽", "amount": "3大勺", "note": "" },
+      { "name": "老抽", "amount": "1大勺", "note": "" },
+      { "name": "冰糖", "amount": "10g", "note": "" },
+      { "name": "青菜", "amount": "适量", "note": "焯水" }
+    ],
+    "steps": [
+      { "phase": "处理牛肉", "items": [
+        "牛腱子肉切大块，冷水下锅焯水，煮出血沫后捞出洗净。"
+      ]},
+      { "phase": "炖煮", "items": [
+        "锅中放少许油，放入洋葱、姜片、蒜瓣炒香，加入豆瓣酱炒出红油。",
+        "放入牛肉块翻炒，加入生抽、老抽、冰糖、八角、桂皮、香叶，翻炒上色。",
+        "加入足量开水，放入番茄块，大火烧开后转小火，盖上锅盖慢炖1.5-2小时，至牛肉软烂。",
+        "尝味调整咸度，捞出香料渣。"
+      ]},
+      { "phase": "煮面装碗", "items": [
+        "另起锅煮面条至自己喜欢的口感，捞出放入碗中。",
+        "浇上牛肉和汤汁，放上焯好的青菜即可。"
+      ]}
+    ],
+    "tips": [
+      "牛腱子肉最适合红烧，筋多肉嫩，炖烂后口感极佳",
+      "加番茄炖煮可增加汤头的鲜甜和层次感",
+      "炖牛肉时水要一次加足，中途加水会影响汤的浓度",
+      "隔夜的牛肉汤更入味，可提前一天炖好牛肉"
+    ]
+  },
+  {
+    "id": 7,
+    "title": "酸辣土豆丝",
+    "category": "家常菜",
+    "subcategory": "素菜",
+    "tags": ["快手", "酸辣", "土豆", "素菜", "下饭"],
+    "difficulty": "简单",
+    "cookingTime": 10,
+    "servings": "2人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese+hot+and+sour+shredded+potato,+thin+crispy+potato+strips+with+dried+chili+peppers+and+vinegar,+green+bell+pepper+strips,+white+plate,+bright+lighting,+overhead+shot&image_size=square",
+    "ingredients": [
+      { "name": "土豆", "amount": "2个", "note": "切细丝" },
+      { "name": "干辣椒", "amount": "3-4个", "note": "剪段" },
+      { "name": "花椒", "amount": "1小勺", "note": "" },
+      { "name": "白醋", "amount": "1大勺", "note": "" },
+      { "name": "盐", "amount": "适量", "note": "" },
+      { "name": "蒜", "amount": "2瓣", "note": "切片" },
+      { "name": "青椒", "amount": "半个", "note": "切丝，可选" }
+    ],
+    "steps": [
+      { "phase": "处理土豆", "items": [
+        "土豆去皮切细丝（越细越好），放入清水中浸泡，洗去多余淀粉，换水2-3次至水清。",
+        "沥干水分备用。"
+      ]},
+      { "phase": "爆炒", "items": [
+        "热锅凉油，放入花椒粒小火炸香后捞出（只要香味不要花椒粒）。",
+        "放入干辣椒段和蒜片爆香，注意不要炒糊。",
+        "转大火，倒入土豆丝，快速翻炒。",
+        "沿锅边淋入白醋，继续翻炒，加盐调味。",
+        "全程大火爆炒约2-3分钟，土豆丝变透明即可出锅。"
+      ]}
+    ],
+    "tips": [
+      "土豆丝泡水去淀粉是脆的关键，水变清说明淀粉去净了",
+      "全程大火爆炒，时间不要超过3分钟，久了就不脆了",
+      "醋要沿锅边淋入，高温激发出醋香",
+      "这道菜的灵魂是「快」和「火大」"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "宫保鸡丁",
+    "category": "家常菜",
+    "subcategory": "鸡肉",
+    "tags": ["川菜", "鸡肉", "花生", "下饭", "宴客"],
+    "difficulty": "中等",
+    "cookingTime": 25,
+    "servings": "2-3人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=authentic+Kung+Pao+chicken,+diced+chicken+with+peanuts,+dried+chili+peppers,+green+scallion+segments,+glossy+sauce,+white+ceramic+plate,+warm+restaurant+lighting,+overhead+food+photography&image_size=square",
+    "ingredients": [
+      { "name": "鸡胸肉", "amount": "300g", "note": "切丁" },
+      { "name": "花生米", "amount": "50g", "note": "炸熟" },
+      { "name": "干辣椒", "amount": "6-8个", "note": "剪段" },
+      { "name": "花椒", "amount": "1小勺", "note": "" },
+      { "name": "葱", "amount": "2根", "note": "切段" },
+      { "name": "蒜", "amount": "2瓣", "note": "切片" },
+      { "name": "姜", "amount": "3片", "note": "" },
+      { "name": "生抽", "amount": "1大勺", "note": "腌肉+调味" },
+      { "name": "料酒", "amount": "1大勺", "note": "" },
+      { "name": "淀粉", "amount": "1小勺", "note": "腌肉" },
+      { "name": "香醋", "amount": "1大勺", "note": "" },
+      { "name": "白糖", "amount": "1大勺", "note": "" },
+      { "name": "老抽", "amount": "少许", "note": "上色" }
+    ],
+    "steps": [
+      { "phase": "腌制", "items": [
+        "鸡胸肉切1.5cm丁，加料酒、生抽、淀粉抓匀腌制15分钟。",
+        "调碗汁：生抽1勺+醋1勺+白糖1勺+淀粉半勺+少许老抽+清水2勺，搅匀备用。"
+      ]},
+      { "phase": "炒制", "items": [
+        "热锅凉油，小火炸花生米至金黄，捞出备用。",
+        "锅中留底油，放入花椒、干辣椒小火炒出香味。",
+        "转大火，放入鸡丁快速滑炒至变色。",
+        "加入姜片、蒜片、葱段炒香。",
+        "倒入碗汁，大火翻炒均匀，汤汁收浓。",
+        "关火前倒入花生米翻拌均匀，出锅。"
+      ]}
+    ],
+    "tips": [
+      "鸡肉用鸡腿肉更嫩，鸡胸肉要注意火候不要炒老",
+      "花生米最后放，保持酥脆",
+      "干辣椒和花椒的量可根据口味调整，正宗宫保鸡丁是「糊辣荔枝味」",
+      "碗汁提前调好，一气呵成"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "手工水饺",
+    "category": "主食",
+    "subcategory": "面食",
+    "tags": ["饺子", "面食", "传统", "节日", "聚餐"],
+    "difficulty": "中等",
+    "cookingTime": 90,
+    "servings": "4-5人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=homemade+Chinese+dumplings+jiaozi,+freshly+boiled+plump+dumplings+on+bamboo+steamer,+dipping+sauce+with+vinegar+and+chili+oil,+steaming+hot,+overhead+shot+on+wooden+table,+natural+light&image_size=square",
+    "ingredients": [
+      { "name": "中筋面粉", "amount": "500g", "note": "" },
+      { "name": "温水", "amount": "250ml", "note": "和面用" },
+      { "name": "猪肉馅", "amount": "400g", "note": "三分肥七分瘦" },
+      { "name": "白菜", "amount": "300g", "note": "切碎挤水" },
+      { "name": "葱", "amount": "3根", "note": "切末" },
+      { "name": "姜", "amount": "1小块", "note": "切末" },
+      { "name": "生抽", "amount": "2大勺", "note": "" },
+      { "name": "香油", "amount": "1大勺", "note": "" },
+      { "name": "盐", "amount": "适量", "note": "" },
+      { "name": "白胡椒粉", "amount": "少许", "note": "" }
+    ],
+    "steps": [
+      { "phase": "和面", "items": [
+        "面粉加温水，边加边搅拌成絮状，揉成光滑面团，盖上湿布醒面30分钟。"
+      ]},
+      { "phase": "制馅", "items": [
+        "白菜切碎，加少许盐腌10分钟，挤干水分。",
+        "猪肉馅中加入姜末、生抽、盐、白胡椒粉、香油，朝一个方向搅拌上劲。",
+        "加入白菜碎和葱花，搅拌均匀。"
+      ]},
+      { "phase": "包饺子", "items": [
+        "醒好的面团揉匀，搓成长条，切成小剂子，擀成中间厚边缘薄的饺子皮。",
+        "包入适量馅料，捏紧封口。"
+      ]},
+      { "phase": "煮饺子", "items": [
+        "大锅水烧开，下饺子，用勺子轻轻推动防止粘底。",
+        "水开后加一碗冷水，重复3次（点三次水），饺子全部浮起即熟。"
+      ]}
+    ],
+    "tips": [
+      "肉馅要朝一个方向搅拌，这样肉馅才会起胶有弹性",
+      "白菜一定要挤干水分，否则包的时候容易出水破皮",
+      "煮饺子「点三次水」是传统方法，确保馅料熟透",
+      "面要醒够时间，擀出来的皮才劲道"
+    ]
+  },
+  {
+    "id": 10,
+    "title": "蒜蓉粉丝蒸虾",
+    "category": "家常菜",
+    "subcategory": "海鲜",
+    "tags": ["蒜蓉", "虾", "蒸", "宴客", "快手"],
+    "difficulty": "简单",
+    "cookingTime": 15,
+    "servings": "3人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=steamed+garlic+shrimp+with+vermicelli+noodles,+butterflied+shrimp+on+bed+of+glass+noodles,+golden+fried+garlic+topping,+green+scallion+garnish,+white+ceramic+plate,+overhead+food+photography&image_size=square",
+    "ingredients": [
+      { "name": "大虾", "amount": "12只", "note": "开背去虾线" },
+      { "name": "粉丝", "amount": "1把", "note": "温水泡软" },
+      { "name": "蒜", "amount": "1整头", "note": "切末" },
+      { "name": "小葱", "amount": "2根", "note": "切葱花" },
+      { "name": "生抽", "amount": "2大勺", "note": "" },
+      { "name": "蚝油", "amount": "1大勺", "note": "" },
+      { "name": "食用油", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      { "phase": "准备", "items": [
+        "大虾开背去虾线，用刀背轻轻拍扁，方便入味。",
+        "粉丝温水泡软后剪短，铺在盘底。",
+        "蒜末分成两份，一份用油小火炸至金黄（金蒜），一份保留生蒜。"
+      ]},
+      { "phase": "蒸制", "items": [
+        "将金蒜和生蒜混合，加入生抽、蚝油拌匀成蒜蓉酱。",
+        "粉丝上摆好虾，每只虾上铺蒜蓉酱。",
+        "蒸锅水开后放入，大火蒸5-6分钟。",
+        "出锅撒葱花，淋一勺热油激香。"
+      ]}
+    ],
+    "tips": [
+      "蒜蓉一半炸一半生，「金银蒜」是粤菜经典做法，香味层次更丰富",
+      "虾开背后用刀背拍扁，蒸出来不会卷曲，卖相更好",
+      "蒸的时间要精准，虾变红即可，蒸久了虾肉变老"
+    ]
+  },
+  {
+    "id": 11,
+    "title": "蛋炒饭",
+    "category": "主食",
+    "subcategory": "米饭",
+    "tags": ["快手", "米饭", "入门", "早餐", "剩饭"],
+    "difficulty": "简单",
+    "cookingTime": 10,
+    "servings": "1-2人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=classic+Chinese+egg+fried+rice,+golden+grains+of+rice+with+egg+pieces,+green+peas,+diced+ham,+scallions,+white+bowl,+steaming+hot,+overhead+food+photography,+bright+lighting&image_size=square",
+    "ingredients": [
+      { "name": "隔夜米饭", "amount": "1碗", "note": "冷藏过的更佳" },
+      { "name": "鸡蛋", "amount": "2个", "note": "" },
+      { "name": "火腿肠", "amount": "半根", "note": "切丁，可选" },
+      { "name": "青豆/玉米粒", "amount": "少许", "note": "可选" },
+      { "name": "葱花", "amount": "适量", "note": "" },
+      { "name": "盐", "amount": "适量", "note": "" },
+      { "name": "食用油", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      { "phase": "准备", "items": [
+        "隔夜米饭提前用手捏散，确保没有结块。",
+        "鸡蛋打散，加少许盐搅匀。"
+      ]},
+      { "phase": "炒制", "items": [
+        "热锅放油，油热后倒入蛋液，用筷子快速划散，蛋液凝固立即盛出。",
+        "锅中再放少许油，倒入米饭，用铲子压散，大火翻炒至米粒分明。",
+        "加入火腿丁、青豆等配料翻炒。",
+        "倒回鸡蛋，撒盐调味，大火翻炒均匀。",
+        "撒葱花，翻炒几下出锅。"
+      ]}
+    ],
+    "tips": [
+      "隔夜饭是炒饭的最佳选择，水分少，炒出来粒粒分明",
+      "米饭下锅前一定要捏散，否则炒不匀",
+      "全程大火，锅要够热，这样才有「镬气」",
+      "鸡蛋先炒盛出，最后回锅，这样鸡蛋嫩、米饭香"
+    ]
+  },
+  {
+    "id": 12,
+    "title": "酸菜鱼",
+    "category": "家常菜",
+    "subcategory": "海鲜",
+    "tags": ["川菜", "鱼", "酸菜", "宴客", "火锅"],
+    "difficulty": "中等",
+    "cookingTime": 40,
+    "servings": "3-4人份",
+    "cover": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Sichuan+sour+pickled+mustard+greens+fish+soup+suan+cai+yu,+tender+white+fish+fillets+in+golden+sour+broth+with+pickled+vegetables,+dried+chili+and+sichuan+peppercorn+on+top,+large+bowl,+steaming,+overhead+shot&image_size=square",
+    "ingredients": [
+      { "name": "草鱼", "amount": "1条", "note": "约750g，片成鱼片" },
+      { "name": "酸菜", "amount": "200g", "note": "切段" },
+      { "name": "干辣椒", "amount": "5-6个", "note": "" },
+      { "name": "花椒", "amount": "1大勺", "note": "" },
+      { "name": "姜", "amount": "5片", "note": "" },
+      { "name": "蒜", "amount": "5瓣", "note": "" },
+      { "name": "蛋清", "amount": "1个", "note": "腌鱼用" },
+      { "name": "淀粉", "amount": "1大勺", "note": "腌鱼用" },
+      { "name": "料酒", "amount": "1大勺", "note": "" },
+      { "name": "盐", "amount": "适量", "note": "" },
+      { "name": "白胡椒粉", "amount": "少许", "note": "" }
+    ],
+    "steps": [
+      { "phase": "处理鱼", "items": [
+        "鱼片加料酒、盐、白胡椒粉、蛋清、淀粉抓匀，腌制15分钟。鱼骨剁块备用。"
+      ]},
+      { "phase": "烹制", "items": [
+        "锅中放油，放入鱼骨煎至两面金黄，盛出。",
+        "锅中留底油，放入姜片、蒜瓣、酸菜炒香。",
+        "加入足量开水，放入煎好的鱼骨，大火煮10分钟至汤色奶白。",
+        "捞出鱼骨和酸菜铺在碗底。",
+        "汤保持微沸，逐片放入鱼片，煮至变白（约30秒），连汤一起倒入碗中。",
+        "鱼片上撒蒜末、干辣椒段、花椒，淋一勺滚烫热油激发香味。"
+      ]}
+    ],
+    "tips": [
+      "鱼片要顺着纹理斜切，厚度约3mm，太薄容易碎",
+      "下鱼片时汤要保持微沸，一片一片下，不要一下子全倒进去",
+      "最后淋热油是点睛之笔，油温一定要够高",
+      "酸菜提前泡水去咸，炒的时候要炒干水汽才香"
+    ]
+  }
+]
