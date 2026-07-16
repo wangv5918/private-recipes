@@ -11,7 +11,7 @@
 const SUPABASE_CONFIG = {
   // 🔑 请在 Supabase Dashboard → Settings → API 中获取 anon key
   url: 'https://ixxpckteitrpcfhwixtx.supabase.co/rest/v1',
-  anonKey: 'YOUR_SUPABASE_ANON_KEY', // ← 替换为你的真实 anon key
+  anonKey: 'sb_publishable_4zIquqgEV_U0S23oSqkIDQ_iPaTwVdV', // ← 替换为你的真实 anon key
   table: 'recipes',
 };
 
