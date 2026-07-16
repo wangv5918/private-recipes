@@ -1698,15 +1698,21 @@ async function handleRecipeSubmit(e) {
       }
     } else {
       // 新增模式
-      const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1;
-      data.id = newId;
+      let newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1;
 
       if (isSupabaseConfigured()) {
         showLoading('创建中...');
-        await createRecipeInSupabase(data);
+        // Supabase 自动生成 ID，不传 id 字段
+        const { id, ...dataWithoutId } = { ...data, id: undefined };
+        const created = await createRecipeInSupabase(dataWithoutId);
         hideLoading();
+        // 使用 Supabase 返回的 ID
+        if (created && created.length > 0 && created[0].id) {
+          newId = created[0].id;
+        }
       }
 
+      data.id = newId;
       recipes.push(data);
       // 生成拼音
       try {
