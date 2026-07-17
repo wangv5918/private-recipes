@@ -49,6 +49,7 @@
 | Web Audio API | 计时器提示音 |
 | Service Worker | PWA 离线缓存 |
 | localStorage | 收藏/购物清单/主题持久化 |
+| 腾讯云 COS | 静态资源存储与托管 |
 | Vercel | 免费部署 |
 
 ---
@@ -60,9 +61,59 @@ git clone https://github.com/wangv5918/private-recipes.git
 cd private-recipes
 
 # 本地运行
-python3 -m http.server 8000
+python -m http.server 8000
 # 打开 http://localhost:8000
 ```
+
+---
+
+## 📦 部署到腾讯云 COS
+
+### 环境配置
+
+```bash
+# 复制配置模板
+cp .env.example .env
+# 编辑 .env 填入真实密钥
+```
+
+`.env` 文件内容：
+
+```ini
+COS_SECRET_ID=your_secret_id
+COS_SECRET_KEY=your_secret_key
+COS_REGION=ap-hongkong
+COS_BUCKET=tocook-1259100080
+CDN_DOMAIN=tocook.top
+```
+
+> ⚠️ `.env` 已在 `.gitignore` 中忽略，不会被提交到 Git。
+
+### 上传文件
+
+```bash
+# 上传当前目录所有文件到 COS
+py upload_to_cos.py
+```
+
+### 刷新 CDN 缓存
+
+> 前提：域名已在腾讯云 CDN 控制台接入加速服务。
+
+```bash
+# 刷新整站缓存
+py refresh_cdn.py
+
+# 刷新指定文件
+py refresh_cdn.py index.html app.js styles.css
+```
+
+### 访问
+
+- COS 直接访问：`https://tocook-1259100080.cos.ap-hongkong.myqcloud.com/index.html`
+- 自定义域名：`https://www.tocook.top`
+
+> 如需 `https://www.tocook.top/` 直接访问（不带 index.html），需在 COS 控制台开启静态网站托管并设置默认索引文档为 `index.html`。
 
 ---
 
@@ -70,23 +121,41 @@ python3 -m http.server 8000
 
 ```
 private-recipes/
-├── index.html             # 主页面（纯 HTML 结构）
-├── styles.css             # 全局样式（含深色模式）
-├── app.js                 # 前端逻辑（搜索/筛选/转盘/收藏/计时/清单/PWA）
-├── recipes_full.json      # 完整菜谱数据（306 道）
-├── recipes.json           # 精简菜谱数据
-├── manifest.json          # PWA 清单
-├── sw.js                  # Service Worker（离线缓存）
-├── parse_recipe.py        # 菜谱解析脚本（文本 → JSON）
-├── parse_cookbook.py      # 飞书文档解析脚本
-├── favicon.svg            # 网站图标
-├── vercel.json            # Vercel 配置
-├── .gitignore             # Git 忽略文件
-├── fetch-recipes.js       # 数据获取脚本
-├── cover-image-options.md # 封面图技术路线分析
-├── edit-feature-options.md# 编辑功能技术路线分析
-├── optimization-plan.md   # 后续优化方向
-└── sample-feishu-export.html # 示例飞书导出文件
+├── index.html                # 主页面
+├── styles.css                # 全局样式（含深色模式）
+├── app.js                    # 前端逻辑（搜索/筛选/转盘/收藏/计时/清单/PWA）
+├── recipes_full.json         # 完整菜谱数据
+├── recipes.json              # 精简菜谱数据
+├── manifest.json             # PWA 清单
+├── sw.js                     # Service Worker（离线缓存）
+├── favicon.svg               # 网站图标
+├── vercel.json               # Vercel 配置
+│
+├── upload_to_cos.py          # COS 上传脚本
+├── refresh_cdn.py            # CDN 缓存刷新脚本
+├── cos_config.py             # 公共配置加载模块
+├── .env.example              # 环境变量模板
+├── .env                      # 环境变量（Git 忽略）
+│
+├── parse_recipe.py           # 菜谱解析脚本（文本 → JSON）
+├── parse_cookbook.py         # 飞书文档解析脚本
+├── parse_docx.py             # Word 文档解析脚本
+├── fetch-recipes.js          # 数据获取脚本
+│
+├── cover-image-options.md    # 封面图技术路线分析
+├── edit-feature-options.md   # 编辑功能技术路线分析
+├── optimization-plan.md      # 后续优化方向
+├── supabase-schema.sql       # 数据库 Schema
+├── supabase.js               # Supabase 客户端
+├── sample-feishu-export.html # 示例飞书导出文件
+│
+├── recipes/                  # 菜谱原文
+│   ├── 奶油蘑菇浓汤.txt
+│   ├── 茄子炒饭.txt
+│   ├── 韩式辣猪蹄.txt
+│   └── 鸡蛋羹.txt
+│
+└── .gitignore                # Git 忽略规则
 ```
 
 ---
@@ -119,17 +188,17 @@ private-recipes/
 
 ```bash
 # 基础用法
-python3 parse_recipe.py recipe.txt \
+python parse_recipe.py recipe.txt \
   --subcategory 鸡肉 \
   --tags 滑蛋,鸡腿,下饭 \
   --time 40 \
   --servings "2人份"
 
 # 仅预览不写入
-python3 parse_recipe.py recipe.txt --dry-run
+python parse_recipe.py recipe.txt --dry-run
 
 # 仅输出JSON
-python3 parse_recipe.py recipe.txt --json-only
+python parse_recipe.py recipe.txt --json-only
 ```
 
 | 参数 | 默认值 | 说明 |

@@ -93,7 +93,7 @@ def sign_tc3(secret_id: str, secret_key: str, service: str, host: str,
 
 
 def call_cdn_api(action: str, body: dict, region: str = "") -> dict:
-    """调用腾讯云 CDN API"""
+    """调用腾讯云 CDN API，返回 (success, data)"""
     payload = json.dumps(body)
     headers = sign_tc3(SECRET_ID, SECRET_KEY, SERVICE, CDN_HOST, action, payload, region)
 
@@ -102,11 +102,19 @@ def call_cdn_api(action: str, body: dict, region: str = "") -> dict:
 
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
+            raw = resp.read().decode("utf-8")
+            data = json.loads(raw)
+            # 检查业务层错误
+            resp_data = data.get("Response", {})
+            if "Error" in resp_data:
+                err = resp_data["Error"]
+                print(f"  API 业务错误: [{err.get('Code')}] {err.get('Message')}")
+                return False, data
+            return True, data
     except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", errors="replace")
-        print(f"  API 错误 [{e.code}]: {body}")
-        return {"error": body}
+        err_body = e.read().decode("utf-8", errors="replace")
+        print(f"  API HTTP 错误 [{e.code}]: {err_body}")
+        return False, {"error": err_body}
 
 
 def refresh_urls(urls: list[str]) -> bool:
@@ -119,10 +127,10 @@ def refresh_urls(urls: list[str]) -> bool:
         print(f"  {u}")
 
     result = call_cdn_api("PurgeUrlsCache", {"Urls": urls})
-    if "error" in result:
+    if not result[0]:
         return False
 
-    task_id = result.get("Response", {}).get("TaskId", "unknown")
+    task_id = result[1].get("Response", {}).get("TaskId", "unknown")
     print(f"  刷新任务已提交，TaskId: {task_id}")
     return True
 
@@ -137,10 +145,10 @@ def refresh_all() -> bool:
     print(f"正在刷新整站缓存: {paths[0]}")
 
     result = call_cdn_api("PurgePathCache", {"Paths": paths, "FlushType": "flush"})
-    if "error" in result:
+    if not result[0]:
         return False
 
-    task_id = result.get("Response", {}).get("TaskId", "unknown")
+    task_id = result[1].get("Response", {}).get("TaskId", "unknown")
     print(f"  刷新任务已提交，TaskId: {task_id}")
     return True
 
