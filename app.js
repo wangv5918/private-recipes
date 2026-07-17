@@ -105,7 +105,7 @@ function renderSidebar() {
         <div class="tree-parent${isOpen ? ' open' : ''}${isActive ? ' active' : ''}"
              data-category="${cat.id}" data-type="parent">
           <span class="arrow">▶</span>
-          <span style="font-size:15px;">${cat.name === '家常菜' ? '🍲' : cat.name === '主食' ? '🍚' : cat.name === '烘焙' ? '🍰' : cat.name === '饮品' ? '🥤' : '📖'}</span>
+          <span style="font-size:15px;">${cat.name === '家常菜' ? '🍲' : cat.name === '主食' ? '🍚' : cat.name === '烘焙' ? '🍰' : cat.name === '饮品' ? '🥤' : cat.name === '甜品' ? '🍮' : '📖'}</span>
           <span>${cat.name}</span>
           <span class="count">${cat.count}</span>
         </div>

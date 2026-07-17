@@ -15510,7 +15510,7 @@
   {
     "title": "戚风蛋糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15546,7 +15546,7 @@
   {
     "title": "榴莲披萨",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15580,7 +15580,7 @@
   {
     "title": "曲奇饼干",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "饼干",
     "tags": [
       "烘焙",
       "甜品"
@@ -15614,7 +15614,7 @@
   {
     "title": "豆乳盒子",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15649,7 +15649,7 @@
   {
     "title": "烤布蕾（法式焦糖布丁）",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15681,7 +15681,7 @@
   {
     "title": "柠檬巴巴露亚",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15716,7 +15716,7 @@
   {
     "title": "巴斯克蛋糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15749,7 +15749,7 @@
   {
     "title": "卡美罗（膨糖）",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15779,7 +15779,7 @@
   {
     "title": "红枣糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15812,7 +15812,7 @@
   {
     "title": "芒果慕斯蛋糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15847,7 +15847,7 @@
   {
     "title": "雪花酥",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "酥点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15882,7 +15882,7 @@
   {
     "title": "轻乳酪蛋糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15917,7 +15917,7 @@
   {
     "title": "老式鸡蛋糕",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "蛋糕",
     "tags": [
       "烘焙",
       "甜品"
@@ -15951,7 +15951,7 @@
   {
     "title": "雪媚娘",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "甜点",
     "tags": [
       "烘焙",
       "甜品"
@@ -15986,7 +15986,7 @@
   {
     "title": "法棍花样吃法",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "面包",
     "tags": [
       "烘焙",
       "甜品"
@@ -16019,7 +16019,7 @@
   {
     "title": "泡芙",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "酥点",
     "tags": [
       "烘焙",
       "甜品"
@@ -16053,7 +16053,7 @@
   {
     "title": "夏威夷可可薄脆",
     "category": "烘焙",
-    "subcategory": "烘焙",
+    "subcategory": "饼干",
     "tags": [
       "烘焙",
       "甜品"
@@ -16090,7 +16090,7 @@
   {
     "title": "荔枝气泡水",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "气泡水",
     "tags": [
       "饮品",
       "饮料"
@@ -16116,7 +16116,7 @@
   {
     "title": "冰镇柠檬薄荷茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16146,7 +16146,7 @@
   {
     "title": "百香果暴打柠檬茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16178,7 +16178,7 @@
   {
     "title": "桂花酒酿冰奶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "奶茶",
     "tags": [
       "饮品",
       "饮料"
@@ -16208,11 +16208,11 @@
   },
   {
     "title": "冰酥酪",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "冰品",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "冰品"
     ],
     "difficulty": "简单",
     "cookingTime": 15,
@@ -16239,7 +16239,7 @@
   {
     "title": "乌梅山楂果味暴打柠檬",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16271,11 +16271,11 @@
   },
   {
     "title": "龙眼椰椰清补凉",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "糖水",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "糖水"
     ],
     "difficulty": "简单",
     "cookingTime": 30,
@@ -16304,11 +16304,11 @@
   },
   {
     "title": "双皮奶",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "奶冻",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "奶冻"
     ],
     "difficulty": "困难",
     "cookingTime": 60,
@@ -16333,11 +16333,11 @@
   },
   {
     "title": "冰粉",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "冰品",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "冰品"
     ],
     "difficulty": "简单",
     "cookingTime": 30,
@@ -16364,11 +16364,11 @@
   },
   {
     "title": "水果撞奶（白凉粉版）",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "奶冻",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "奶冻"
     ],
     "difficulty": "简单",
     "cookingTime": 20,
@@ -16397,7 +16397,7 @@
   {
     "title": "玫瑰黑糖姜茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "热饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16428,7 +16428,7 @@
   {
     "title": "橙香热米酒",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "热饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16458,7 +16458,7 @@
   {
     "title": "黑芝麻炖奶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "热饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16489,7 +16489,7 @@
   {
     "title": "内蒙古奶茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "奶茶",
     "tags": [
       "饮品",
       "饮料"
@@ -16517,11 +16517,11 @@
   },
   {
     "title": "茶冻撞奶",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "奶冻",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "奶冻"
     ],
     "difficulty": "简单",
     "cookingTime": 15,
@@ -16547,7 +16547,7 @@
   {
     "title": "喜茶芝士芒芒",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "奶茶",
     "tags": [
       "饮品",
       "饮料"
@@ -16577,11 +16577,11 @@
   },
   {
     "title": "杨枝甘露",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "糖水",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "糖水"
     ],
     "difficulty": "中等",
     "cookingTime": 30,
@@ -16609,7 +16609,7 @@
   {
     "title": "草莓牛乳奶茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "奶茶",
     "tags": [
       "饮品",
       "饮料"
@@ -16638,7 +16638,7 @@
   {
     "title": "抹茶星冰乐",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16669,7 +16669,7 @@
   {
     "title": "瑞幸轻轻茉莉",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16700,7 +16700,7 @@
   {
     "title": "生椰抹茶",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16731,7 +16731,7 @@
   {
     "title": "生椰拿铁",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16761,7 +16761,7 @@
   {
     "title": "干姜美式",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16791,7 +16791,7 @@
   {
     "title": "橙C美式",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "咖啡",
     "tags": [
       "饮品",
       "饮料"
@@ -16821,7 +16821,7 @@
   {
     "title": "冰鲜柠檬水",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16849,7 +16849,7 @@
   {
     "title": "棒打鲜橙",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16873,11 +16873,11 @@
   },
   {
     "title": "姜撞奶",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "奶冻",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "奶冻"
     ],
     "difficulty": "中等",
     "cookingTime": 15,
@@ -16903,7 +16903,7 @@
   {
     "title": "酸梅汤",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "茶饮",
     "tags": [
       "饮品",
       "饮料"
@@ -16928,7 +16928,7 @@
   {
     "title": "莫吉托Mojito",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "鸡尾酒",
     "tags": [
       "饮品",
       "饮料"
@@ -16956,7 +16956,7 @@
   {
     "title": "蛋黄酒",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "鸡尾酒",
     "tags": [
       "饮品",
       "饮料"
@@ -16980,7 +16980,7 @@
   {
     "title": "教父",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "鸡尾酒",
     "tags": [
       "饮品",
       "饮料"
@@ -17006,7 +17006,7 @@
   {
     "title": "桑格利亚汽酒",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "鸡尾酒",
     "tags": [
       "饮品",
       "饮料"
@@ -17039,7 +17039,7 @@
   {
     "title": "冰红茶之恋",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "鸡尾酒",
     "tags": [
       "饮品",
       "饮料"
@@ -17065,7 +17065,7 @@
   {
     "title": "牛油果奶昔",
     "category": "饮品",
-    "subcategory": "饮品",
+    "subcategory": "奶昔",
     "tags": [
       "饮品",
       "饮料"
@@ -17088,11 +17088,11 @@
   },
   {
     "title": "酸奶冰豆花",
-    "category": "饮品",
-    "subcategory": "饮品",
+    "category": "甜品",
+    "subcategory": "冰品",
     "tags": [
-      "饮品",
-      "饮料"
+      "甜品",
+      "冰品"
     ],
     "difficulty": "困难",
     "cookingTime": 120,
