@@ -326,7 +326,37 @@ function renderResults() {
 }
 
 // ==================== MODAL ====================
+// 兼容扁平字符串格式（烘焙/饮品菜谱）与结构化对象格式（家常菜/主食）
+function normalizeRecipe(recipe) {
+  const r = { ...recipe };
+
+  // 食材兼容：字符串数组 → { name, amount, note } 数组
+  if (r.ingredients && r.ingredients.length > 0 && typeof r.ingredients[0] === 'string') {
+    r.ingredients = r.ingredients.map(ing => {
+      // 拆分 "名称：用量（备注）" 格式
+      const match = ing.match(/^(.+?)[：:]\s*(.+)$/);
+      if (match) {
+        return { name: match[1].trim(), amount: match[2].trim(), note: '' };
+      }
+      return { name: ing, amount: '', note: '' };
+    });
+  }
+
+  // 步骤兼容：字符串数组 → [{ phase: "制作步骤", items: [...] }] 格式
+  if (r.steps && r.steps.length > 0 && typeof r.steps[0] === 'string') {
+    r.steps = [{
+      phase: '制作步骤',
+      items: r.steps
+    }];
+  }
+
+  return r;
+}
+
 function showModal(recipe) {
+  // 兼容扁平字符串格式：将食材和步骤统一转为结构化格式
+  recipe = normalizeRecipe(recipe);
+
   const hasIng = recipe.ingredients && recipe.ingredients.length > 0;
   const hasNutrition = recipe.nutrition && recipe.nutrition.length > 0;
   const hasExtra = recipe.extra && recipe.extra.length > 0;

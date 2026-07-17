@@ -1291,6 +1291,13 @@ def parse_drinks():
     return recipes
 
 
+def assign_ids(recipes, start_id=1):
+    """为菜谱自动分配递增 id"""
+    for i, r in enumerate(recipes):
+        r["id"] = start_id + i
+    return recipes
+
+
 def save_recipes_to_json(recipes, filepath):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(recipes, f, ensure_ascii=False, indent=2)
@@ -1300,10 +1307,14 @@ def save_recipes_to_json(recipes, filepath):
 def add_to_full_json(recipes, full_json_path):
     with open(full_json_path, 'r', encoding='utf-8') as f:
         existing = json.load(f)
+    # 自动分配 id，从已有最大 id + 1 开始
+    max_id = max((r.get("id", 0) for r in existing), default=0)
+    assign_ids(recipes, start_id=max_id + 1)
     existing.extend(recipes)
     with open(full_json_path, 'w', encoding='utf-8') as f:
         json.dump(existing, f, ensure_ascii=False, indent=2)
     print(f"📄 已将 {len(recipes)} 道菜谱添加到 {full_json_path}")
+    print(f"   id 范围: {max_id + 1} ~ {max_id + len(recipes)}")
     print(f"   总菜谱数: {len(existing)}")
 
 
