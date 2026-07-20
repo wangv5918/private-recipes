@@ -143,7 +143,7 @@ function bindSidebarEvents() {
       state.activeChildCategory = null;
       state.activeCategory = 'all';
       updateFilterTags();
-      renderSidebar();
+      updateSidebarActive();
       renderResults();
     });
   });
@@ -155,9 +155,30 @@ function bindSidebarEvents() {
       state.activeParentCategory = this.dataset.parent;
       state.activeCategory = this.dataset.category;
       updateFilterTags();
-      renderSidebar();
+      updateSidebarActive();
       renderResults();
     });
+  });
+}
+
+// 轻量级更新侧边栏激活状态（仅切换CSS类，不重建DOM）
+function updateSidebarActive() {
+  document.querySelectorAll('.tree-parent').forEach(el => {
+    const catId = el.dataset.category;
+    const isActive = (catId === 'all' && state.activeParentCategory === 'all' && !state.activeChildCategory) ||
+      (catId !== 'all' && state.activeParentCategory === catId && !state.activeChildCategory);
+    el.classList.toggle('active', isActive);
+    el.classList.toggle('open', state.openCategories.has(catId));
+  });
+
+  document.querySelectorAll('.tree-child').forEach(el => {
+    el.classList.toggle('active', state.activeChildCategory === el.dataset.category);
+  });
+
+  document.querySelectorAll('.tree-children').forEach(el => {
+    const parentEl = el.closest('.tree-group')?.querySelector('.tree-parent');
+    const parentId = parentEl?.dataset.category;
+    el.classList.toggle('open', parentId && state.openCategories.has(parentId));
   });
 }
 
@@ -186,7 +207,7 @@ function renderFilterTags() {
         state.activeParentCategory = catId;
         state.activeChildCategory = null;
       }
-      renderSidebar();
+      updateSidebarActive();
       renderResults();
     });
   } else {

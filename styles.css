@@ -394,8 +394,9 @@ body {
   .cards-grid { grid-template-columns: 1fr; }
   .topbar { padding: 10px 12px; gap: 8px; }
   .search-wrapper { max-width: none; }
-  .filter-row { padding-left: 14px; padding-right: 14px; flex-wrap: wrap; gap: 8px; }
-  .filter-tags { flex: 1; min-width: 0; }
+  .filter-row { padding-left: 14px; padding-right: 14px; flex-wrap: wrap; gap: 6px; }
+  .filter-tags { flex: 1 1 100%; min-width: 0; }
+  .stat-badge, .fav-badge, .shopping-badge { font-size: 11px; padding: 4px 10px; }
   .filter-select {
     width: 100%;
     padding: 8px 32px 8px 14px;
