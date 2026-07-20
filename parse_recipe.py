@@ -521,6 +521,13 @@ def main():
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     print(f"✅ 已添加: ID={next_id} {recipe['title']} → {recipes_file}")
+    #  生成一个 1.txt 文件，用于后续使用，内容为空 ；文件路径为当前脚本所在目录下的 recipes文件夹下
+    recipes_dir = os.path.join(script_dir, "recipes")
+    txt_path = os.path.join(recipes_dir, "1.txt")
+    if not os.path.exists(txt_path):
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write("")
+        print(f"📄 已生成空白文件: {txt_path} (可用于后续菜谱输入)")
 
 
 if __name__ == "__main__":
