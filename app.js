@@ -164,22 +164,54 @@ function bindSidebarEvents() {
 // ==================== FILTER TAGS ====================
 function renderFilterTags() {
   const container = document.getElementById('filterTags');
-  let html = `<button class="filter-tag${state.activeCategory === 'all' ? ' active' : ''}" data-category="all">全部</button>`;
+  const isMobile = window.innerWidth <= 768;
 
-  categoryTree.forEach(cat => {
-    cat.children.forEach(child => {
-      html += `<button class="filter-tag${state.activeCategory === child.id ? ' active' : ''}" data-category="${child.id}">${child.name} (${child.count})</button>`;
+  if (isMobile) {
+    // 手机端使用下拉选择，节省空间
+    let html = `<select class="filter-select" id="filterSelect">
+      <option value="all"${state.activeCategory === 'all' ? ' selected' : ''}>全部菜谱 (${recipes.length})</option>`;
+    categoryTree.forEach(cat => {
+      const isActive = state.activeCategory === cat.id || state.activeParentCategory === cat.id;
+      html += `<option value="${cat.id}"${isActive ? ' selected' : ''}>${cat.name} (${cat.count})</option>`;
     });
-  });
-
-  container.innerHTML = html;
-  bindFilterTagEvents();
+    html += '</select>';
+    container.innerHTML = html;
+    document.getElementById('filterSelect').addEventListener('change', function() {
+      const catId = this.value;
+      state.activeCategory = catId;
+      if (catId === 'all') {
+        state.activeParentCategory = 'all';
+        state.activeChildCategory = null;
+      } else {
+        state.activeParentCategory = catId;
+        state.activeChildCategory = null;
+      }
+      renderSidebar();
+      renderResults();
+    });
+  } else {
+    // 桌面端显示所有二级分类
+    let html = `<button class="filter-tag${state.activeCategory === 'all' ? ' active' : ''}" data-category="all">全部</button>`;
+    categoryTree.forEach(cat => {
+      cat.children.forEach(child => {
+        html += `<button class="filter-tag${state.activeCategory === child.id ? ' active' : ''}" data-category="${child.id}">${child.name} (${child.count})</button>`;
+      });
+    });
+    container.innerHTML = html;
+    bindFilterTagEvents();
+  }
 }
 
 function updateFilterTags() {
   document.querySelectorAll('.filter-tag').forEach(tag => {
     tag.classList.toggle('active', tag.dataset.category === state.activeCategory);
   });
+  // 同步手机端下拉选择
+  const select = document.getElementById('filterSelect');
+  if (select) {
+    const val = state.activeCategory === 'all' ? 'all' : (state.activeParentCategory || state.activeCategory);
+    select.value = val;
+  }
 }
 
 function bindFilterTagEvents() {
@@ -239,7 +271,13 @@ function getFilteredRecipes() {
   }
 
   if (state.activeCategory !== 'all') {
-    filtered = filtered.filter(r => r.subcategory === state.activeCategory);
+    // 判断是一级分类还是二级分类
+    const isParent = categoryTree.some(cat => cat.id === state.activeCategory);
+    if (isParent) {
+      filtered = filtered.filter(r => r.category === state.activeCategory);
+    } else {
+      filtered = filtered.filter(r => r.subcategory === state.activeCategory);
+    }
   }
 
   return filtered;

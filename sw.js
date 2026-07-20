@@ -3,7 +3,7 @@
  * 缓存策略：Cache First（优先使用缓存，网络失败时回退）
  */
 
-const CACHE_NAME = 'private-recipes-v4';
+const CACHE_NAME = 'private-recipes-v5';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
