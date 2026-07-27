@@ -150,10 +150,10 @@ private-recipes/
 ├── sample-feishu-export.html # 示例飞书导出文件
 │
 ├── recipes/                  # 菜谱原文
-│   ├── 奶油蘑菇浓汤.txt
-│   ├── 茄子炒饭.txt
-│   ├── 韩式辣猪蹄.txt
-│   └── 鸡蛋羹.txt
+│   ├── 奶油蘑菇浓汤.md
+│   ├── 茄子炒饭.md
+│   ├── 韩式辣猪蹄.md
+│   └── 鸡蛋羹.md
 │
 └── .gitignore                # Git 忽略规则
 ```
@@ -188,17 +188,17 @@ private-recipes/
 
 ```bash
 # 基础用法
-python parse_recipe.py recipe.txt \
+python parse_recipe.py recipe.md \
   --subcategory 鸡肉 \
   --tags 滑蛋,鸡腿,下饭 \
   --time 40 \
   --servings "2人份"
 
 # 仅预览不写入
-python parse_recipe.py recipe.txt --dry-run
+python parse_recipe.py recipe.md --dry-run
 
 # 仅输出JSON
-python parse_recipe.py recipe.txt --json-only
+python parse_recipe.py recipe.md --json-only
 ```
 
 | 参数 | 默认值 | 说明 |

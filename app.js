@@ -439,6 +439,7 @@ function showModal(recipe) {
         ${hasIng ? `<button class="add-shopping-btn" id="modalShoppingBtn" data-id="${recipe.id}">🛒 加入清单</button>` : ''}
         <button class="modal-timer-trigger" id="modalTimerBtn" data-id="${recipe.id}">⏱ 开始计时</button>
         <button class="modal-edit-btn" id="modalEditBtn" data-id="${recipe.id}">✏️ 编辑</button>
+        <button class="modal-raw-btn" id="modalRawBtn" data-title="${recipe.title}">📄 查看原始文件</button>
       </div>`;
 
   // 食材清单
@@ -531,6 +532,15 @@ function showModal(recipe) {
       </div>`;
   }
 
+  // 原始文件预览区域
+  html += `
+    <div class="modal-section raw-file-section" id="rawFileSection" style="display:none">
+      <h3><span class="section-icon">📄</span> 原始文件预览</h3>
+      <div class="raw-file-content" id="rawFileContent">
+        <div class="raw-loading">加载中...</div>
+      </div>
+    </div>`;
+
   html += '</div>';
 
   const modal = document.getElementById('modalContent');
@@ -583,11 +593,114 @@ function showModal(recipe) {
       openRecipeForm(recipe);
     });
   }
+
+  // 弹窗内查看原始文件按钮
+  const modalRawBtn = document.getElementById('modalRawBtn');
+  if (modalRawBtn) {
+    modalRawBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleRawFile(recipe.title);
+    });
+  }
 }
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('show');
   document.body.style.overflow = '';
+}
+
+// ==================== RAW FILE PREVIEW ====================
+/**
+ * 切换原始文件预览区域的显示/隐藏
+ * 如果已加载过内容，直接切换显示；否则先加载
+ */
+async function toggleRawFile(title) {
+  const section = document.getElementById('rawFileSection');
+  const content = document.getElementById('rawFileContent');
+  const btn = document.getElementById('modalRawBtn');
+
+  if (!section || !content) return;
+
+  // 如果已显示，则隐藏
+  if (section.style.display !== 'none') {
+    section.style.display = 'none';
+    if (btn) btn.textContent = '📄 查看原始文件';
+    return;
+  }
+
+  // 如果还没加载过内容，先加载
+  if (content.querySelector('.raw-loading')) {
+    section.style.display = 'block';
+    if (btn) btn.textContent = '📄 隐藏原始文件';
+    await loadRawFile(title, content);
+    // 滚动到文件预览区域
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    section.style.display = 'block';
+    if (btn) btn.textContent = '📄 隐藏原始文件';
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * 加载原始菜谱文件内容
+ * 尝试从 recipes/ 目录下加载同名 .md 文件
+ */
+async function loadRawFile(title, container) {
+  const fileName = encodeURIComponent(title) + '.md';
+  try {
+    const res = await fetch('recipes/' + fileName);
+    if (!res.ok) {
+      // 尝试用原始标题（可能包含特殊字符）
+      const altRes = await fetch('recipes/' + title + '.md');
+      if (!altRes.ok) {
+        container.innerHTML = '<div class="raw-error">未找到原始文件: recipes/' + title + '.md</div>';
+        return;
+      }
+      renderRawContent(await altRes.text(), container);
+      return;
+    }
+    const text = await res.text();
+    renderRawContent(text, container);
+  } catch (err) {
+    container.innerHTML = '<div class="raw-error">加载失败: ' + err.message + '</div>';
+  }
+}
+
+/**
+ * 将原始文本渲染为格式化的 HTML
+ * 简单处理：保留换行，转义 HTML，高亮标题行
+ */
+function renderRawContent(text, container) {
+  // 转义 HTML 特殊字符
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 按行处理，给标题行添加样式
+  const lines = escaped.split('\n');
+  const html = lines.map(line => {
+    const trimmed = line.trim();
+    // 一级标题（一、二、三、）
+    if (/^[一二三四五六七八九十]、/.test(trimmed)) {
+      return '<div class="raw-h1">' + line + '</div>';
+    }
+    // 二级标题（第X部分）
+    if (/^第[一二三四五六七八九十\d]+部分/.test(trimmed)) {
+      return '<div class="raw-h2">' + line + '</div>';
+    }
+    // Markdown 标题
+    if (/^###/.test(trimmed)) {
+      return '<div class="raw-h3">' + line + '</div>';
+    }
+    if (/^##/.test(trimmed)) {
+      return '<div class="raw-h2">' + line + '</div>';
+    }
+    return '<div class="raw-line">' + (line || '&nbsp;') + '</div>';
+  }).join('');
+
+  container.innerHTML = '<pre class="raw-pre">' + html + '</pre>';
 }
 
 // ==================== EVENTS ====================

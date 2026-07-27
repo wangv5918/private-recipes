@@ -973,6 +973,62 @@ body {
   margin-top: 10px; margin-bottom: 8px;
 }
 
+/* 查看原始文件按钮 */
+.modal-raw-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 7px 14px; border-radius: 50px;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  border: 1.5px solid var(--border); background: var(--bg-card);
+  color: var(--text-secondary); cursor: pointer;
+  transition: all var(--transition); white-space: nowrap;
+}
+.modal-raw-btn:hover {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--accent-light);
+}
+
+/* 原始文件预览区域 */
+.raw-file-section { margin-top: 20px; }
+.raw-file-content {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.raw-pre {
+  margin: 0; padding: 16px 20px;
+  font-size: 13px; line-height: 1.8;
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 500px; overflow-y: auto;
+  background: var(--bg-warm);
+}
+.raw-loading {
+  padding: 30px; text-align: center;
+  color: var(--text-muted); font-size: 14px;
+}
+.raw-error {
+  padding: 20px; text-align: center;
+  color: var(--red); font-size: 13px;
+}
+.raw-h1 {
+  font-weight: 700; font-size: 15px; color: var(--accent);
+  margin-top: 16px; margin-bottom: 4px;
+  padding-bottom: 4px; border-bottom: 1px solid var(--border);
+}
+.raw-h2 {
+  font-weight: 600; font-size: 14px; color: var(--text);
+  margin-top: 12px; margin-bottom: 2px;
+}
+.raw-h3 {
+  font-weight: 600; font-size: 13px; color: var(--text-secondary);
+  margin-top: 8px;
+}
+.raw-line {
+  color: var(--text-secondary);
+}
+
 /* Add Recipe Button */
 .add-recipe-btn {
   display: flex; align-items: center; gap: 4px;

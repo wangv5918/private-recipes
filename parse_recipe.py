@@ -3,8 +3,8 @@
 菜谱解析脚本 — 将菜谱文字自动解析为 JSON 并追加到 recipes_full.json
 
 用法：
-  1. 将菜谱文字保存为 .txt 文件
-  2. 运行: python3 parse_recipe.py recipe.txt
+  1. 将菜谱文字保存为 .md 文件
+  2. 运行: python3 parse_recipe.py recipe.md
   3. 可选参数:
      --category   指定分类，默认"家常菜"
      --subcategory 指定子分类
@@ -32,7 +32,7 @@
       - 列表格式
 
 示例：
-  python3 parse_recipe.py 双皮奶.txt --category 饮品 --subcategory 饮品 --time 60 --difficulty 困难
+  python3 parse_recipe.py 双皮奶.md --category 饮品 --subcategory 饮品 --time 60 --difficulty 困难
 """
 
 import json
@@ -521,9 +521,9 @@ def main():
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     print(f"✅ 已添加: ID={next_id} {recipe['title']} → {recipes_file}")
-    #  生成一个 1.txt 文件，用于后续使用，内容为空 ；文件路径为当前脚本所在目录下的 recipes文件夹下
+    #  生成一个 1.md 文件，用于后续使用，内容为空 ；文件路径为当前脚本所在目录下的 recipes文件夹下
     recipes_dir = os.path.join(script_dir, "recipes")
-    txt_path = os.path.join(recipes_dir, "1.txt")
+    txt_path = os.path.join(recipes_dir, "1.md")
     if not os.path.exists(txt_path):
         with open(txt_path, "w", encoding="utf-8") as f:
             f.write("")

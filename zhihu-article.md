@@ -74,7 +74,7 @@
 
 ```bash
 # 把菜谱文字一键转成JSON，追加到菜谱库
-python3 parse_recipe.py 番茄炒蛋.txt \
+python3 parse_recipe.py 番茄炒蛋.md \
   --subcategory 素菜 \
   --tags 番茄,鸡蛋,快手,下饭 \
   --time 15
