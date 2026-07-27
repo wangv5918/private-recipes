@@ -1656,20 +1656,7 @@ document.getElementById('shoppingCopy').addEventListener('click', copyShoppingLi
 renderShoppingList();
 
 // ==================== PWA ====================
-/**
- * PWA 离线支持
- * - 注册 Service Worker 缓存静态资源
- * - 支持离线访问和添加到主屏幕
- */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      console.log('SW registered:', reg.scope);
-    }).catch(err => {
-      console.log('SW registration failed:', err);
-    });
-  });
-}
+// SW 已移除 — 不再使用 Service Worker 缓存
 
 // ==================== RECIPE FORM (CRUD) ====================
 let editingRecipeId = null; // null = 新增模式, number = 编辑模式
