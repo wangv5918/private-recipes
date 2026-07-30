@@ -81,6 +81,10 @@ let state = {
   activeChildCategory: null,
   openCategories: new Set(categoryTree.map(c => c.id)), // all open by default
   showFavsOnly: false,          // 是否只显示收藏
+  showTips: false,              // 是否显示厨房小技巧
+  tipsContent: null,            // 厨房小技巧解析后的HTML内容
+  tipsRawContent: null,         // 厨房小技巧原始Markdown文本
+  tipsRawVisible: false,        // 是否显示原始文件
 };
 
 // ==================== SIDEBAR ====================
@@ -125,7 +129,14 @@ function renderSidebar() {
   });
 
   nav.innerHTML = html;
+  // 添加厨房小技巧入口
+  nav.insertAdjacentHTML('beforeend', `
+    <div class="tips-nav-entry${state.showTips ? ' active' : ''}" id="tipsNavEntry">
+      <span class="tips-nav-icon">💡</span>
+      <span>厨房小技巧</span>
+    </div>`);
   bindSidebarEvents();
+  bindTipsNavEvent();
 }
 
 function bindSidebarEvents() {
@@ -142,6 +153,9 @@ function bindSidebarEvents() {
       state.activeParentCategory = catId === 'all' ? 'all' : catId;
       state.activeChildCategory = null;
       state.activeCategory = 'all';
+      state.showTips = false;
+      state.tipsRawVisible = false;
+      document.getElementById('filterTags').parentElement.style.display = '';
       updateFilterTags();
       updateSidebarActive();
       renderResults();
@@ -154,6 +168,9 @@ function bindSidebarEvents() {
       state.activeChildCategory = this.dataset.category;
       state.activeParentCategory = this.dataset.parent;
       state.activeCategory = this.dataset.category;
+      state.showTips = false;
+      state.tipsRawVisible = false;
+      document.getElementById('filterTags').parentElement.style.display = '';
       updateFilterTags();
       updateSidebarActive();
       renderResults();
@@ -179,6 +196,131 @@ function updateSidebarActive() {
     const parentEl = el.closest('.tree-group')?.querySelector('.tree-parent');
     const parentId = parentEl?.dataset.category;
     el.classList.toggle('open', parentId && state.openCategories.has(parentId));
+  });
+
+  // 更新厨房小技巧入口状态
+  const tipsEntry = document.getElementById('tipsNavEntry');
+  if (tipsEntry) {
+    tipsEntry.classList.toggle('active', state.showTips);
+  }
+}
+
+// ==================== KITCHEN TIPS ====================
+function bindTipsNavEvent() {
+  const tipsEntry = document.getElementById('tipsNavEntry');
+  if (!tipsEntry) return;
+  tipsEntry.addEventListener('click', function() {
+    if (state.showTips) return; // 已经在显示中
+    state.showTips = true;
+    state.activeCategory = 'all';
+    state.activeParentCategory = 'all';
+    state.activeChildCategory = null;
+    // 关闭移动端侧边栏
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+    updateSidebarActive();
+    updateFilterTags();
+    showKitchenTips();
+  });
+}
+
+/**
+ * 加载并渲染厨房小技巧页面
+ * 如果已缓存则直接使用缓存，否则从 厨房小技巧.md 加载
+ */
+async function showKitchenTips() {
+  const container = document.getElementById('resultsArea');
+  const filterRow = document.getElementById('filterTags').parentElement;
+
+  // 隐藏筛选栏
+  filterRow.style.display = 'none';
+
+  // 显示加载状态
+  container.innerHTML = `
+    <div class="tips-loading">
+      <div class="loading-spinner"></div>
+      <p>加载厨房小技巧中...</p>
+    </div>`;
+
+  try {
+    if (!state.tipsContent) {
+      const res = await fetch('厨房小技巧.md');
+      if (!res.ok) throw new Error('加载失败: ' + res.status);
+      const raw = await res.text();
+      state.tipsRawContent = raw;
+
+      // 使用 marked 解析 Markdown
+      if (typeof marked !== 'undefined') {
+        state.tipsContent = marked.parse(raw);
+      } else {
+        // 降级：简单HTML转义+换行处理
+        state.tipsContent = raw
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+      }
+    }
+    renderKitchenTips();
+  } catch (err) {
+    console.error('加载厨房小技巧失败:', err);
+    container.innerHTML = `
+      <div class="tips-error">
+        <p>加载失败: ${err.message}</p>
+        <button class="tips-raw-btn" onclick="location.reload()">重试</button>
+      </div>`;
+  }
+}
+
+/**
+ * 渲染厨房小技巧页面
+ */
+function renderKitchenTips() {
+  const container = document.getElementById('resultsArea');
+  const rawBtnText = state.tipsRawVisible ? '📄 隐藏原始文件' : '📄 查看原始文件';
+
+  let html = `
+    <div class="tips-page">
+      <div class="tips-page-header">
+        <h2>💡 厨房小技巧</h2>
+        <div class="tips-header-actions">
+          <button class="tips-raw-btn" id="tipsRawBtn">${rawBtnText}</button>
+          <button class="tips-raw-btn" id="tipsBackBtn">← 返回菜谱</button>
+        </div>
+      </div>
+      <div class="tips-content" id="tipsContent">${state.tipsContent}</div>`;
+
+  // 原始文件预览区域
+  html += `
+    <div class="tips-raw-section" id="tipsRawSection" style="${state.tipsRawVisible ? '' : 'display:none'}">
+      <h3><span class="section-icon">📄</span> 原始文件预览</h3>
+      <div class="tips-raw-content">
+        <pre class="tips-raw-pre">${state.tipsRawContent
+          ? state.tipsRawContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          : ''}</pre>
+      </div>
+    </div>`;
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  // 绑定事件
+  document.getElementById('tipsRawBtn').addEventListener('click', function() {
+    state.tipsRawVisible = !state.tipsRawVisible;
+    const section = document.getElementById('tipsRawSection');
+    if (section) {
+      section.style.display = state.tipsRawVisible ? 'block' : 'none';
+      if (state.tipsRawVisible) section.scrollIntoView({ behavior: 'smooth' });
+    }
+    this.textContent = state.tipsRawVisible ? '📄 隐藏原始文件' : '📄 查看原始文件';
+  });
+
+  document.getElementById('tipsBackBtn').addEventListener('click', function() {
+    state.showTips = false;
+    state.tipsRawVisible = false;
+    document.getElementById('filterTags').parentElement.style.display = '';
+    updateSidebarActive();
+    updateFilterTags();
+    renderResults();
   });
 }
 
@@ -1821,8 +1963,7 @@ function openRecipeForm(recipe = null) {
 function closeRecipeForm() {
   document.getElementById('recipeFormOverlay').classList.remove('show');
   document.body.style.overflow = '';
-  // 恢复计时器显示
-  document.getElementById('timerWidget').style.display = '';
+  // 计时器已隐藏，不再恢复
 }
 
 function parseFormData(form) {

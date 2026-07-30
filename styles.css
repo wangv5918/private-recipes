@@ -1137,3 +1137,176 @@ body {
   .form-row-3 { grid-template-columns: 1fr; }
   .recipe-form-modal { max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 }
+
+/* ========== Kitchen Tips ========== */
+
+/* Sidebar 厨房小技巧 entry */
+.tips-nav-entry {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text); transition: all var(--transition);
+  user-select: none; margin-top: 4px;
+  border-top: 1px solid var(--border-light);
+}
+.tips-nav-entry:hover { background: var(--accent-light); color: var(--accent); }
+.tips-nav-entry.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.tips-nav-entry .tips-nav-icon {
+  width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+
+/* Tips Page Container */
+.tips-page {
+  padding: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.tips-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 2px solid var(--accent-light);
+  flex-wrap: wrap; gap: 10px;
+}
+.tips-page-header h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px; font-weight: 700; color: var(--text);
+}
+.tips-page-header .tips-header-actions {
+  display: flex; gap: 8px;
+}
+.tips-raw-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 14px; border-radius: 50px;
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  border: 1.5px solid var(--accent); background: var(--bg-card);
+  color: var(--accent); cursor: pointer;
+  transition: all var(--transition); white-space: nowrap;
+}
+.tips-raw-btn:hover {
+  background: var(--accent); color: #fff;
+}
+
+/* Tips Content (parsed markdown) */
+.tips-content {
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.tips-content h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 26px; font-weight: 700; color: var(--text);
+  margin: 28px 0 16px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent-light);
+}
+.tips-content h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px; font-weight: 700; color: var(--text);
+  margin: 24px 0 14px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+.tips-content h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; font-weight: 600; color: var(--accent);
+  margin: 20px 0 10px;
+}
+.tips-content h4 {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  margin: 16px 0 8px;
+}
+.tips-content p {
+  margin: 10px 0; font-size: 14px;
+}
+.tips-content ul, .tips-content ol {
+  margin: 8px 0; padding-left: 22px;
+}
+.tips-content li {
+  margin: 4px 0; font-size: 14px; line-height: 1.7;
+}
+.tips-content strong {
+  color: var(--text); font-weight: 600;
+}
+.tips-content em {
+  color: var(--accent); font-style: italic;
+}
+.tips-content a {
+  color: var(--accent); text-decoration: none;
+}
+.tips-content a:hover { text-decoration: underline; }
+.tips-content code {
+  background: var(--bg-warm); padding: 2px 6px;
+  border-radius: 4px; font-size: 13px;
+  color: var(--accent);
+}
+.tips-content pre {
+  background: var(--bg-warm); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 18px;
+  overflow-x: auto; font-size: 13px; line-height: 1.6;
+  margin: 12px 0;
+}
+.tips-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 8px 16px; margin: 12px 0;
+  background: var(--accent-light);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+}
+.tips-content hr {
+  border: none; border-top: 1px solid var(--border-light);
+  margin: 20px 0;
+}
+.tips-content table {
+  width: 100%; border-collapse: collapse;
+  margin: 14px 0; font-size: 13px;
+  overflow-x: auto; display: block;
+}
+.tips-content th, .tips-content td {
+  border: 1px solid var(--border);
+  padding: 8px 12px; text-align: left;
+  white-space: nowrap;
+}
+.tips-content th {
+  background: var(--bg-warm); font-weight: 600; color: var(--text);
+}
+.tips-content td {
+  color: var(--text-secondary);
+}
+.tips-content img {
+  max-width: 100%; border-radius: var(--radius-sm);
+  margin: 10px 0; box-shadow: var(--shadow-sm);
+}
+
+/* Tips Raw File Section */
+.tips-raw-section {
+  margin-top: 20px;
+}
+.tips-raw-content {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.tips-raw-pre {
+  margin: 0; padding: 16px 20px;
+  font-size: 13px; line-height: 1.8;
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 500px; overflow-y: auto;
+  background: var(--bg-warm);
+}
+.tips-loading {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.tips-loading .loading-spinner {
+  margin: 0 auto 16px;
+}
+.tips-error {
+  text-align: center; padding: 60px 20px; color: var(--red);
+}
+
+@media (max-width: 768px) {
+  .tips-page-header { flex-direction: column; align-items: flex-start; }
+  .tips-content h1 { font-size: 22px; }
+  .tips-content h2 { font-size: 18px; }
+  .tips-content h3 { font-size: 16px; }
+}
