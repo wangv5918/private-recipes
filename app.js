@@ -276,43 +276,18 @@ async function showKitchenTips() {
  */
 function renderKitchenTips() {
   const container = document.getElementById('resultsArea');
-  const rawBtnText = state.tipsRawVisible ? '📄 隐藏原始文件' : '📄 查看原始文件';
 
   let html = `
     <div class="tips-page">
       <div class="tips-page-header">
         <h2>💡 厨房小技巧</h2>
         <div class="tips-header-actions">
-          <button class="tips-raw-btn" id="tipsRawBtn">${rawBtnText}</button>
           <button class="tips-raw-btn" id="tipsBackBtn">← 返回菜谱</button>
         </div>
       </div>
-      <div class="tips-content" id="tipsContent">${state.tipsContent}</div>`;
-
-  // 原始文件预览区域
-  html += `
-    <div class="tips-raw-section" id="tipsRawSection" style="${state.tipsRawVisible ? '' : 'display:none'}">
-      <h3><span class="section-icon">📄</span> 原始文件预览</h3>
-      <div class="tips-raw-content">
-        <pre class="tips-raw-pre">${state.tipsRawContent
-          ? state.tipsRawContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-          : ''}</pre>
-      </div>
+      <div class="tips-content" id="tipsContent">${state.tipsContent}</div>
     </div>`;
-
-  html += '</div>';
   container.innerHTML = html;
-
-  // 绑定事件
-  document.getElementById('tipsRawBtn').addEventListener('click', function() {
-    state.tipsRawVisible = !state.tipsRawVisible;
-    const section = document.getElementById('tipsRawSection');
-    if (section) {
-      section.style.display = state.tipsRawVisible ? 'block' : 'none';
-      if (state.tipsRawVisible) section.scrollIntoView({ behavior: 'smooth' });
-    }
-    this.textContent = state.tipsRawVisible ? '📄 隐藏原始文件' : '📄 查看原始文件';
-  });
 
   document.getElementById('tipsBackBtn').addEventListener('click', function() {
     state.showTips = false;
